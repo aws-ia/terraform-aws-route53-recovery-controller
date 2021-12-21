@@ -4,12 +4,11 @@ locals {
 
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
-  global_table_arns = {for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region)}
+  global_table_arns = try({for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region)}, null)
 
-  # TODO: add check for
-  # lb
-  # asg
-  # db
+  config_lbs = var.cell_attributes[local.regions[0]].lb != null ? true : false
+  config_asgs = var.cell_attributes[local.regions[0]].asg != null ? true : false
+  config_ddb = var.global_table_arn != null ? true : false
 }
 
 resource "aws_route53recoveryreadiness_cell" "per_region" {
@@ -22,20 +21,24 @@ resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
   cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
 }
 
-resource "aws_route53recoveryreadiness_resource_set" "albs" {
-  resource_set_name = "${var.name}-ResourceSet-ALB"
+resource "aws_route53recoveryreadiness_resource_set" "lbs" {
+  count = local.config_lbs ? 1 : 0
+
+  resource_set_name = "${var.name}-ResourceSet-lb"
   resource_set_type = "AWS::ElasticLoadBalancingV2::LoadBalancer"
 
   dynamic resources {
     for_each = var.cell_attributes
     content {
-      resource_arn     = resources.value.alb
+      resource_arn     = resources.value.lb
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
     }
   }
 }
 
 resource "aws_route53recoveryreadiness_resource_set" "asgs" {
+  count = local.config_asgs ? 1 : 0
+
   resource_set_name = "${var.name}-ResourceSet-ASG"
   resource_set_type = "AWS::AutoScaling::AutoScalingGroup"
 
@@ -49,6 +52,8 @@ resource "aws_route53recoveryreadiness_resource_set" "asgs" {
 }
 
 resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
+  count = local.config_ddb ? 1 : 0
+
   resource_set_name = "${var.name}-ResourceSet-DDB"
   resource_set_type = "AWS::DynamoDB::Table"
 
@@ -63,19 +68,24 @@ resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
 
 
 ## implement check and condition
-resource "aws_route53recoveryreadiness_readiness_check" "alb" {
-  readiness_check_name = "${var.name}-ReadinessCheck-ALB"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.albs.resource_set_name
+resource "aws_route53recoveryreadiness_readiness_check" "lb" {
+  count = local.config_lbs ? 1 : 0
+
+  readiness_check_name = "${var.name}-ReadinessCheck-lb"
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.lbs[0].resource_set_name
 }
 
 resource "aws_route53recoveryreadiness_readiness_check" "asg" {
+  count = local.config_asgs ? 1 : 0
   readiness_check_name = "${var.name}-ReadinessCheck-ASG"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.asgs.resource_set_name
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.asgs[0].resource_set_name
 }
 
 resource "aws_route53recoveryreadiness_readiness_check" "ddb" {
+  count = local.config_ddb ? 1 : 0
+
   readiness_check_name = "${var.name}-ReadinessCheck-DynamoDB"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.ddbs.resource_set_name
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.ddbs[0].resource_set_name
 }
 
 resource "aws_route53recoverycontrolconfig_cluster" "main" {
