@@ -6,11 +6,6 @@ locals {
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
   global_table_arns = {for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region)}
 
-  # ddb_table = one(compact([for cell in var.cell_attributes: cell.ddb_table_arn != null ? cell.ddb_table_arn : ""]))
-  # primary_cell_region = split(":", local.ddb_table)[3]
-  #[for cell in var.cell_attributes: cell.ddb_table_arn]
-  #
-
   # TODO: add check for
   # lb
   # asg
