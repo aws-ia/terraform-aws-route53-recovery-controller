@@ -1,6 +1,7 @@
 locals {
   regions = keys(var.cell_attributes)
   cell_arn_by_region = {for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn}
+  routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
 
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
@@ -10,6 +11,8 @@ locals {
   config_asgs = var.cell_attributes[local.regions[0]].asg != null ? true : false
   config_ddb = var.global_table_arn != null ? true : false
 }
+
+# Readiness controls
 
 resource "aws_route53recoveryreadiness_cell" "per_region" {
   for_each = toset(local.regions)
@@ -66,8 +69,6 @@ resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
   }
 }
 
-
-## implement check and condition
 resource "aws_route53recoveryreadiness_readiness_check" "lb" {
   count = local.config_lbs ? 1 : 0
 
@@ -88,6 +89,8 @@ resource "aws_route53recoveryreadiness_readiness_check" "ddb" {
   resource_set_name    = aws_route53recoveryreadiness_resource_set.ddbs[0].resource_set_name
 }
 
+## Routing Control
+
 resource "aws_route53recoverycontrolconfig_cluster" "main" {
   name = "${var.name}-Cluster"
 }
@@ -105,16 +108,33 @@ resource "aws_route53recoverycontrolconfig_routing_control" "per_cell" {
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
 }
 
-resource "aws_route53recoverycontrolconfig_safety_rule" "main" {
-  asserted_controls = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
+resource "aws_route53recoverycontrolconfig_safety_rule" "assertion" {
+  count = var.create_safety_rule_assertion
+
+  asserted_controls = local.routing_controls_arns
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
-  name              = "${var.name}-MinCellsActive"
-  wait_period_ms    = 5000
+  name              = "${var.name}-${var.safety_rule_assertion.name_suffix}"
+  wait_period_ms    = var.safety_rule_assertion.wait_period_ms
 
   rule_config {
-    inverted  = false
-    threshold = 1
-    type      = "ATLEAST"
+    inverted  = var.safety_rule_assertion.inverted
+    threshold = var.safety_rule_assertion.threshold
+    type      = var.safety_rule_assertion.type
+  }
+}
+
+resource "aws_route53recoverycontrolconfig_safety_rule" "gating" {
+  count = var.create_safety_rule_gating
+
+  gating_controls = local.routing_controls_arns
+  control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
+  name              = "${var.name}-${var.safety_rule_gating.name_suffix}"
+  wait_period_ms    = var.safety_rule_gating.wait_period_ms
+
+  rule_config {
+    inverted  = var.safety_rule_gating.inverted
+    threshold = var.safety_rule_gating.threshold
+    type      = var.safety_rule_gating.type
   }
 }
 
