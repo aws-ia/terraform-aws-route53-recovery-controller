@@ -1,21 +1,12 @@
-data "aws_route53_zone" "main" {
-  count = var.hosted_zone.zone_id == null ? 1 : 0
-
-  name         = var.hosted_zone.name
-  private_zone = var.hosted_zone.private_zone
-  vpc_id       = var.hosted_zone.vpc_id
-  tags         = var.hosted_zone.tags
-}
-
 locals {
-  regions = keys(var.cell_attributes)
+  regions        = keys(var.cell_attributes)
+  primary_region = var.primary_cell_region == null ? data.aws_region.current.name : var.primary_cell_region
   # list of all services referenced in var.cell_attributes
   service_list          = setintersection(flatten([for k, v in var.cell_attributes : keys(v)]))
   routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
   zone_id               = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
   domain_name           = try(data.aws_route53_zone.main[0].name, var.hosted_zone.name)
   cell_arn_by_region    = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
-
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
   global_table_arns = try({ for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region) }, null)
@@ -46,7 +37,7 @@ resource "aws_route53recoveryreadiness_resource_set" "lbs" {
   dynamic "resources" {
     for_each = var.cell_attributes
     content {
-      resource_arn     = resources.value.elasticloadbalancing.arn
+      resource_arn     = resources.value.elasticloadbalancing
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
     }
   }
@@ -165,14 +156,14 @@ resource "aws_route53_record" "alias" {
   name    = "${var.name}.${local.domain_name}"
   type    = "A"
   alias {
-    name                   = each.value.elasticloadbalancing.dns_name
-    zone_id                = each.value.elasticloadbalancing.lb_zone_id
+    name                   = lookup(local.lb_info, each.key, null).dns_name
+    zone_id                = lookup(local.lb_info, each.key, null).zone_id
     evaluate_target_health = true
   }
   set_identifier = "${var.name}-${each.key}"
   failover_routing_policy {
-    type = each.key == var.primary_cell_region ? "PRIMARY" : "SECONDARY"
+    type = each.key == local.primary_region ? "PRIMARY" : "SECONDARY"
   }
 
-  # health_check_id = lookup(aws_route53_health_check.main, each.key, null).id
+  health_check_id = lookup(aws_route53_health_check.main, each.key, null).id
 }
