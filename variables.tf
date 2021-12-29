@@ -5,7 +5,11 @@ variable "name" {
 
 variable "cell_attributes" {
   type = map(object({
-    elasticloadbalancing  = optional(string)
+    elasticloadbalancing = optional(object({
+      arn        = string,
+      lb_zone_id = string,
+      dns_name   = string,
+    })),
     autoscaling = optional(string)
   }))
 }
@@ -64,3 +68,7 @@ variable "hosted_zone" {
   default = null
 }
 
+variable "primary_cell_region" {
+  type    = string
+  default = null
+}

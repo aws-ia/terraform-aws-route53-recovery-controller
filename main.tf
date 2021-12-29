@@ -8,18 +8,17 @@ data "aws_route53_zone" "main" {
 }
 
 locals {
-  regions            = keys(var.cell_attributes)
-  cell_arn_by_region = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
+  regions = keys(var.cell_attributes)
   # list of all services referenced in var.cell_attributes
-  service_list          = setintersection([for v in flatten([for k, v in var.cell_attributes : values(v)]) : split(":", v)[2]])
+  service_list          = setintersection(flatten([for k, v in var.cell_attributes : keys(v)]))
   routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
   zone_id               = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
+  domain_name           = try(data.aws_route53_zone.main[0].name, var.hosted_zone.name)
+  cell_arn_by_region    = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
 
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
   global_table_arns = try({ for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region) }, null)
-
-  # resource_set_types = [for k, v in var.cell_attributes : ]
 
   config_lbs  = contains(local.service_list, "elasticloadbalancing")
   config_asgs = contains(local.service_list, "autoscaling")
@@ -47,7 +46,7 @@ resource "aws_route53recoveryreadiness_resource_set" "lbs" {
   dynamic "resources" {
     for_each = var.cell_attributes
     content {
-      resource_arn     = resources.value.elasticloadbalancing
+      resource_arn     = resources.value.elasticloadbalancing.arn
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
     }
   }
@@ -159,19 +158,21 @@ resource "aws_route53_health_check" "main" {
   type                = "RECOVERY_CONTROL"
 }
 
-# resource "aws_route53_record" "alias" {
-#   zone_id = local.zone_id
-#   name    = "${var.name}.${local.zone_id}"
-#   type    = "A"
-#   alias {
-#     name                   = "${var.LoadBalancerDNSNameEast}"
-#     zone_id                = "${var.LoadBalancerHostedZoneEast}"
-#     evaluate_target_health = true
-#   }
-#   set_identifier =  "${var.ProjectId}-east"
-#   failover_routing_policy {
-#     type = "PRIMARY"
-#   }
+resource "aws_route53_record" "alias" {
+  for_each = local.config_lbs ? var.cell_attributes : {}
 
-#   health_check_id = aws_route53_health_check.HealthCheckCell1.id
-# }
+  zone_id = local.zone_id
+  name    = "${var.name}.${local.domain_name}"
+  type    = "A"
+  alias {
+    name                   = each.value.elasticloadbalancing.dns_name
+    zone_id                = each.value.elasticloadbalancing.lb_zone_id
+    evaluate_target_health = true
+  }
+  set_identifier = "${var.name}-${each.key}"
+  failover_routing_policy {
+    type = each.key == var.primary_cell_region ? "PRIMARY" : "SECONDARY"
+  }
+
+  # health_check_id = lookup(aws_route53_health_check.main, each.key, null).id
+}
