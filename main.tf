@@ -1,21 +1,35 @@
+data "aws_route53_zone" "main" {
+  count = var.hosted_zone.zone_id == null ? 1 : 0
+
+  name         = var.hosted_zone.name
+  private_zone = var.hosted_zone.private_zone
+  vpc_id       = var.hosted_zone.vpc_id
+  tags         = var.hosted_zone.tags
+}
+
 locals {
-  regions = keys(var.cell_attributes)
-  cell_arn_by_region = {for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn}
+  regions            = keys(var.cell_attributes)
+  cell_arn_by_region = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
+  # list of all services referenced in var.cell_attributes
+  service_list          = setintersection([for v in flatten([for k, v in var.cell_attributes : values(v)]) : split(":", v)[2]])
   routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
+  zone_id               = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
 
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
-  global_table_arns = try({for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region)}, null)
+  global_table_arns = try({ for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region) }, null)
 
-  config_lbs = var.cell_attributes[local.regions[0]].lb != null ? true : false
-  config_asgs = var.cell_attributes[local.regions[0]].asg != null ? true : false
-  config_ddb = var.global_table_arn != null ? true : false
+  # resource_set_types = [for k, v in var.cell_attributes : ]
+
+  config_lbs  = contains(local.service_list, "elasticloadbalancing")
+  config_asgs = contains(local.service_list, "autoscaling")
+  config_ddb  = var.global_table_arn != null ? true : false
 }
 
 # Readiness controls
 
 resource "aws_route53recoveryreadiness_cell" "per_region" {
-  for_each = toset(local.regions)
+  for_each  = toset(local.regions)
   cell_name = "${var.name}-${each.value}"
 }
 
@@ -30,10 +44,10 @@ resource "aws_route53recoveryreadiness_resource_set" "lbs" {
   resource_set_name = "${var.name}-ResourceSet-lb"
   resource_set_type = "AWS::ElasticLoadBalancingV2::LoadBalancer"
 
-  dynamic resources {
+  dynamic "resources" {
     for_each = var.cell_attributes
     content {
-      resource_arn     = resources.value.lb
+      resource_arn     = resources.value.elasticloadbalancing
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
     }
   }
@@ -45,10 +59,10 @@ resource "aws_route53recoveryreadiness_resource_set" "asgs" {
   resource_set_name = "${var.name}-ResourceSet-ASG"
   resource_set_type = "AWS::AutoScaling::AutoScalingGroup"
 
-  dynamic resources {
+  dynamic "resources" {
     for_each = var.cell_attributes
     content {
-      resource_arn     = resources.value.asg
+      resource_arn     = resources.value.autoscaling
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
     }
   }
@@ -60,7 +74,7 @@ resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
   resource_set_name = "${var.name}-ResourceSet-DDB"
   resource_set_type = "AWS::DynamoDB::Table"
 
-  dynamic resources {
+  dynamic "resources" {
     for_each = local.global_table_arns
     content {
       resource_arn     = resources.value
@@ -77,7 +91,7 @@ resource "aws_route53recoveryreadiness_readiness_check" "lb" {
 }
 
 resource "aws_route53recoveryreadiness_readiness_check" "asg" {
-  count = local.config_asgs ? 1 : 0
+  count                = local.config_asgs ? 1 : 0
   readiness_check_name = "${var.name}-ReadinessCheck-ASG"
   resource_set_name    = aws_route53recoveryreadiness_resource_set.asgs[0].resource_set_name
 }
@@ -109,7 +123,7 @@ resource "aws_route53recoverycontrolconfig_routing_control" "per_cell" {
 }
 
 resource "aws_route53recoverycontrolconfig_safety_rule" "assertion" {
-  count = var.create_safety_rule_assertion
+  count = var.create_safety_rule_assertion ? 1 : 0
 
   asserted_controls = local.routing_controls_arns
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
@@ -124,9 +138,9 @@ resource "aws_route53recoverycontrolconfig_safety_rule" "assertion" {
 }
 
 resource "aws_route53recoverycontrolconfig_safety_rule" "gating" {
-  count = var.create_safety_rule_gating
+  count = var.create_safety_rule_gating ? 1 : 0
 
-  gating_controls = local.routing_controls_arns
+  gating_controls   = local.routing_controls_arns
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
   name              = "${var.name}-${var.safety_rule_gating.name_suffix}"
   wait_period_ms    = var.safety_rule_gating.wait_period_ms
@@ -144,3 +158,20 @@ resource "aws_route53_health_check" "main" {
   routing_control_arn = each.value.arn
   type                = "RECOVERY_CONTROL"
 }
+
+# resource "aws_route53_record" "alias" {
+#   zone_id = local.zone_id
+#   name    = "${var.name}.${local.zone_id}"
+#   type    = "A"
+#   alias {
+#     name                   = "${var.LoadBalancerDNSNameEast}"
+#     zone_id                = "${var.LoadBalancerHostedZoneEast}"
+#     evaluate_target_health = true
+#   }
+#   set_identifier =  "${var.ProjectId}-east"
+#   failover_routing_policy {
+#     type = "PRIMARY"
+#   }
+
+#   health_check_id = aws_route53_health_check.HealthCheckCell1.id
+# }
