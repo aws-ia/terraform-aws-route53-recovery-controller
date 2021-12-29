@@ -14,6 +14,12 @@ locals {
   config_lbs  = contains(local.service_list, "elasticloadbalancing")
   config_asgs = contains(local.service_list, "autoscaling")
   config_ddb  = var.global_table_arn != null ? true : false
+
+  resource_type_name = {
+    elasticloadbalancing = "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    autoscaling          = "AWS::AutoScaling::AutoScalingGroup"
+    dynamodb             = "AWS::DynamoDB::Table"
+  }
 }
 
 # Readiness controls
@@ -28,11 +34,11 @@ resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
   cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
 }
 
-resource "aws_route53recoveryreadiness_resource_set" "lbs" {
+resource "aws_route53recoveryreadiness_resource_set" "elasticloadbalancing" {
   count = local.config_lbs ? 1 : 0
 
   resource_set_name = "${var.name}-ResourceSet-lb"
-  resource_set_type = "AWS::ElasticLoadBalancingV2::LoadBalancer"
+  resource_set_type = lookup(local.resource_type_name, "elasticloadbalancing")
 
   dynamic "resources" {
     for_each = var.cell_attributes
@@ -43,11 +49,11 @@ resource "aws_route53recoveryreadiness_resource_set" "lbs" {
   }
 }
 
-resource "aws_route53recoveryreadiness_resource_set" "asgs" {
+resource "aws_route53recoveryreadiness_resource_set" "autoscaling" {
   count = local.config_asgs ? 1 : 0
 
   resource_set_name = "${var.name}-ResourceSet-ASG"
-  resource_set_type = "AWS::AutoScaling::AutoScalingGroup"
+  resource_set_type = lookup(local.resource_type_name, "autoscaling")
 
   dynamic "resources" {
     for_each = var.cell_attributes
@@ -58,11 +64,11 @@ resource "aws_route53recoveryreadiness_resource_set" "asgs" {
   }
 }
 
-resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
+resource "aws_route53recoveryreadiness_resource_set" "dynamodb" {
   count = local.config_ddb ? 1 : 0
 
   resource_set_name = "${var.name}-ResourceSet-DDB"
-  resource_set_type = "AWS::DynamoDB::Table"
+  resource_set_type = lookup(local.resource_type_name, "dynamodb")
 
   dynamic "resources" {
     for_each = local.global_table_arns
@@ -73,24 +79,24 @@ resource "aws_route53recoveryreadiness_resource_set" "ddbs" {
   }
 }
 
-resource "aws_route53recoveryreadiness_readiness_check" "lb" {
+resource "aws_route53recoveryreadiness_readiness_check" "elasticloadbalancing" {
   count = local.config_lbs ? 1 : 0
 
   readiness_check_name = "${var.name}-ReadinessCheck-lb"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.lbs[0].resource_set_name
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.elasticloadbalancing[0].resource_set_name
 }
 
-resource "aws_route53recoveryreadiness_readiness_check" "asg" {
+resource "aws_route53recoveryreadiness_readiness_check" "autoscaling" {
   count                = local.config_asgs ? 1 : 0
   readiness_check_name = "${var.name}-ReadinessCheck-ASG"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.asgs[0].resource_set_name
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.autoscaling[0].resource_set_name
 }
 
-resource "aws_route53recoveryreadiness_readiness_check" "ddb" {
+resource "aws_route53recoveryreadiness_readiness_check" "dynamodb" {
   count = local.config_ddb ? 1 : 0
 
   readiness_check_name = "${var.name}-ReadinessCheck-DynamoDB"
-  resource_set_name    = aws_route53recoveryreadiness_resource_set.ddbs[0].resource_set_name
+  resource_set_name    = aws_route53recoveryreadiness_resource_set.dynamodb[0].resource_set_name
 }
 
 ## Routing Control
