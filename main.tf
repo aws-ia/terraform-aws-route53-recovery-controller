@@ -6,7 +6,7 @@ locals {
   routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
   zone_id               = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
   domain_name           = try(data.aws_route53_zone.main[0].name, var.hosted_zone.name)
-  cell_arn_by_region    = { for k, v in awscc_route53recoveryreadiness_cell.per_region : k => v.cell_arn }
+  cell_arn_by_region    = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
   global_table_arns = try({ for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region) }, null)
@@ -26,14 +26,14 @@ locals {
 
 # Readiness controls
 
-resource "awscc_route53recoveryreadiness_cell" "per_region" {
+resource "aws_route53recoveryreadiness_cell" "per_region" {
   for_each  = toset(local.regions)
   cell_name = "${var.name}-${each.value}"
 }
 
 resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
   recovery_group_name = var.name
-  cells               = [for _, v in awscc_route53recoveryreadiness_cell.per_region : v.cell_arn]
+  cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
 }
 
 resource "aws_route53recoveryreadiness_resource_set" "elasticloadbalancing" {
