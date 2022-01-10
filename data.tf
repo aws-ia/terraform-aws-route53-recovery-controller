@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 
 data "aws_route53_zone" "main" {
-  count = var.hosted_zone.zone_id == null || var.hosted_zone.name == null ? 1 : 0
+  count = var.configure_route53_alias_records && var.hosted_zone.zone_id == null || var.hosted_zone.name == null ? 1 : 0
 
   name         = var.hosted_zone.name
   private_zone = var.hosted_zone.private_zone
@@ -33,77 +33,77 @@ locals {
 }
 
 data "aws_lb" "us_east_1" {
-  count    = local.config_lbs && contains(local.regions, "us-east-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "us-east-1") ? 1 : 0
   provider = aws.us-east-1
 
   arn = var.cell_attributes["us-east-1"].elasticloadbalancing
 }
 
 data "aws_lb" "us_west_2" {
-  count    = local.config_lbs && contains(local.regions, "us-west-2") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "us-west-2") ? 1 : 0
   provider = aws.us-west-2
 
   arn = var.cell_attributes["us-west-2"].elasticloadbalancing
 }
 
 data "aws_lb" "us_east_2" {
-  count    = local.config_lbs && contains(local.regions, "us-east-2") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "us-east-2") ? 1 : 0
   provider = aws.us-east-2
 
   arn = var.cell_attributes["us-east-2"].elasticloadbalancing
 }
 
 data "aws_lb" "us_west_1" {
-  count    = local.config_lbs && contains(local.regions, "us-west-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "us-west-1") ? 1 : 0
   provider = aws.us-west-1
 
   arn = var.cell_attributes["us-west-1"].elasticloadbalancing
 }
 
 data "aws_lb" "ca_central_1" {
-  count    = local.config_lbs && contains(local.regions, "ca-central-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ca-central-1") ? 1 : 0
   provider = aws.ca-central-1
 
   arn = var.cell_attributes["ca-central-1"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_south_1" {
-  count    = local.config_lbs && contains(local.regions, "ap-south-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-south-1") ? 1 : 0
   provider = aws.ap-south-1
 
   arn = var.cell_attributes["ap-south-1"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_northeast_3" {
-  count    = local.config_lbs && contains(local.regions, "ap-northeast-3") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-northeast-3") ? 1 : 0
   provider = aws.ap-northeast-3
 
   arn = var.cell_attributes["ap-northeast-3"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_northeast_2" {
-  count    = local.config_lbs && contains(local.regions, "ap-northeast-2") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-northeast-2") ? 1 : 0
   provider = aws.ap-northeast-2
 
   arn = var.cell_attributes["ap-northeast-2"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_northeast_1" {
-  count    = local.config_lbs && contains(local.regions, "ap-northeast-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-northeast-1") ? 1 : 0
   provider = aws.ap-northeast-1
 
   arn = var.cell_attributes["ap-northeast-1"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_southeast_1" {
-  count    = local.config_lbs && contains(local.regions, "ap-southeast-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-southeast-1") ? 1 : 0
   provider = aws.ap-southeast-1
 
   arn = var.cell_attributes["ap-southeast-1"].elasticloadbalancing
 }
 
 data "aws_lb" "ap_southeast_2" {
-  count    = local.config_lbs && contains(local.regions, "ap-southeast-2") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "ap-southeast-2") ? 1 : 0
   provider = aws.ap-southeast-2
 
   arn = var.cell_attributes["ap-southeast-2"].elasticloadbalancing
@@ -111,42 +111,42 @@ data "aws_lb" "ap_southeast_2" {
 
 
 data "aws_lb" "eu_central_1" {
-  count    = local.config_lbs && contains(local.regions, "eu-central-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "eu-central-1") ? 1 : 0
   provider = aws.eu-central-1
 
   arn = var.cell_attributes["eu-central-1"].elasticloadbalancing
 }
 
 data "aws_lb" "eu_west_1" {
-  count    = local.config_lbs && contains(local.regions, "eu-west-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "eu-west-1") ? 1 : 0
   provider = aws.eu-west-1
 
   arn = var.cell_attributes["eu-west-1"].elasticloadbalancing
 }
 
 data "aws_lb" "eu_west_2" {
-  count    = local.config_lbs && contains(local.regions, "eu-west-2") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "eu-west-2") ? 1 : 0
   provider = aws.eu-west-2
 
   arn = var.cell_attributes["eu-west-2"].elasticloadbalancing
 }
 
 data "aws_lb" "eu_west_3" {
-  count    = local.config_lbs && contains(local.regions, "eu-west-3") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "eu-west-3") ? 1 : 0
   provider = aws.eu-west-3
 
   arn = var.cell_attributes["eu-west-3"].elasticloadbalancing
 }
 
 data "aws_lb" "eu_north_1" {
-  count    = local.config_lbs && contains(local.regions, "eu-north-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "eu-north-1") ? 1 : 0
   provider = aws.eu-north-1
 
   arn = var.cell_attributes["eu-north-1"].elasticloadbalancing
 }
 
 data "aws_lb" "sa_east_1" {
-  count    = local.config_lbs && contains(local.regions, "sa-east-1") ? 1 : 0
+  count    = local.configure_lbs && contains(local.regions, "sa-east-1") ? 1 : 0
   provider = aws.sa-east-1
 
   arn = var.cell_attributes["sa-east-1"].elasticloadbalancing

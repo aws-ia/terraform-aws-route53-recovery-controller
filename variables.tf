@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "cell_attributes" {
-  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`. Example below:"
+  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below:"
   /*
   cell_attributes = {
     us-west-2 = {
@@ -16,7 +16,7 @@ variable "cell_attributes" {
   type = map(object({
     elasticloadbalancing = optional(string)
     autoscaling          = optional(string)
-    dynamodb             = optional(string)
+    lambda               = optional(string)
   }))
 }
 
@@ -88,4 +88,10 @@ variable "primary_cell_region" {
     condition = can(regex("[a-z][a-z]-[a-z]+-[1-9]", var.primary_cell_region))
     error_message = "Must be a valid AWS region format."
   }
+}
+
+variable "configure_route53_alias_records" {
+  description = "If LBs are managed, determines if you want to create the requisite route53 alias records"
+  type = bool
+  default = true
 }
