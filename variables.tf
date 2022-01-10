@@ -3,10 +3,10 @@ variable "name" {
   type        = string
 }
 
-variable "cell_attributes" {
+variable "cells_definition" {
   description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below:"
   /*
-  cell_attributes = {
+  cells_definition = {
     us-west-2 = {
       elasticloadbalancing = "arn:aws:elasticloadbalancing:us-west-2:<>:loadbalancer/app/<>"
       autoscaling          = "arn:aws:autoscaling:us-west-2:<>:autoScalingGroup:*:autoScalingGroupName/<>

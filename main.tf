@@ -1,12 +1,12 @@
 locals {
-  regions        = keys(var.cell_attributes)
+  regions        = keys(var.cells_definition)
   primary_region = var.primary_cell_region == null ? data.aws_region.current.name : var.primary_cell_region
-  # list of all services referenced in var.cell_attributes with non-null arns
-  service_list          = setintersection(flatten([for _, cell_definition in var.cell_attributes : [for service_name, arn in cell_definition : arn != null ? service_name : null]]))
+  # list of all services referenced in var.cells_definition with non-null arns
+  service_list          = setintersection(flatten([for _, cell_definition in var.cells_definition : [for service_name, arn in cell_definition : arn != null ? service_name : null]]))
   routing_controls_arns = [for k, v in aws_route53recoverycontrolconfig_routing_control.per_cell : v.arn]
   zone_id               = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
   domain_name           = try(data.aws_route53_zone.main[0].name, var.hosted_zone.name)
-  cell_arn_by_region    = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
+  cell_arn_by_region    = { for k, v in awscc_route53recoveryreadiness_cell.per_region : k => v.cell_arn }
   # Optionals
   # aws_dynamodb_global_table only provides a single region arn, contruct all global table arns
   global_table_arns = try({ for region in local.regions : region => replace(var.global_table_arn, split(":", var.global_table_arn)[3], region) }, null)
@@ -26,14 +26,14 @@ locals {
 
 # Readiness controls
 
-resource "aws_route53recoveryreadiness_cell" "per_region" {
+resource "awscc_route53recoveryreadiness_cell" "per_region" {
   for_each  = toset(local.regions)
   cell_name = "${var.name}-${each.value}"
 }
 
 resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
   recovery_group_name = var.name
-  cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
+  cells               = [for _, v in awscc_route53recoveryreadiness_cell.per_region : v.cell_arn]
 }
 
 resource "aws_route53recoveryreadiness_resource_set" "elasticloadbalancing" {
@@ -43,7 +43,7 @@ resource "aws_route53recoveryreadiness_resource_set" "elasticloadbalancing" {
   resource_set_type = lookup(local.resource_type_name, "elasticloadbalancing")
 
   dynamic "resources" {
-    for_each = var.cell_attributes
+    for_each = var.cells_definition
     content {
       resource_arn     = resources.value.elasticloadbalancing
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
@@ -58,7 +58,7 @@ resource "aws_route53recoveryreadiness_resource_set" "autoscaling" {
   resource_set_type = lookup(local.resource_type_name, "autoscaling")
 
   dynamic "resources" {
-    for_each = var.cell_attributes
+    for_each = var.cells_definition
     content {
       resource_arn     = resources.value.autoscaling
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
@@ -73,7 +73,7 @@ resource "aws_route53recoveryreadiness_resource_set" "lambda" {
   resource_set_type = lookup(local.resource_type_name, "lambda")
 
   dynamic "resources" {
-    for_each = var.cell_attributes
+    for_each = var.cells_definition
     content {
       resource_arn     = resources.value.lambda
       readiness_scopes = [lookup(local.cell_arn_by_region, resources.key, null)]
@@ -180,7 +180,7 @@ resource "aws_route53_health_check" "main" {
 }
 
 resource "aws_route53_record" "alias" {
-  for_each = var.configure_route53_alias_records && local.configure_lbs ? var.cell_attributes : {}
+  for_each = var.configure_route53_alias_records && local.configure_lbs ? var.cells_definition : {}
 
   zone_id = local.zone_id
   name    = "${var.name}.${local.domain_name}"
