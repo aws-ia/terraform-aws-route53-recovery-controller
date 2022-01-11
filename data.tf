@@ -1,19 +1,4 @@
-data "aws_region" "current" {}
-
-// if zone_id and name are not passed, search for the other using available info
-data "aws_route53_zone" "main" {
-  count = var.configure_route53_alias_records && var.hosted_zone.zone_id == null || var.hosted_zone.name == null ? 1 : 0
-
-  name         = var.hosted_zone.name
-  private_zone = var.hosted_zone.private_zone
-  vpc_id       = var.hosted_zone.vpc_id
-  tags         = var.hosted_zone.tags
-}
-
 locals {
-  zone_id     = try(data.aws_route53_zone.main[0].zone_id, var.hosted_zone.zone_id)
-  domain_name = try(data.aws_route53_zone.main[0].name, var.hosted_zone.name)
-
   configure_lbs = contains(local.service_list, "elasticloadbalancing")
 
   lb_info = merge({

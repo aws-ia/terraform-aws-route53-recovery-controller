@@ -1,19 +1,19 @@
 output "recovery_group" {
   description = "Recovery Group resource."
-  value       = module.recovery_group.aws_route53recoveryreadiness_recovery_group.all_regions
+  value       = module.recovery_group.recovery_group
 }
 
 output "cells" {
   description = "Cells per region."
-  value       = module.recovery_group.aws_route53recoveryreadiness_cell.per_region
+  value       = module.recovery_group.cells
 }
 
 output "resource_sets" {
   description = "A Resource Set for each service with ARN entries for each region."
-  value       = module.recovery_group.aws_route53recoveryreadiness_resource_set.each_region_per_service
+  value       = module.recovery_group.resource_sets
 }
 
 output "readiness_checks" {
   description = "A Readiness Check for each Resource Set"
-  value       = module.recovery_group.aws_route53recoveryreadiness_readiness_check.per_service
+  value       = module.recovery_group.readiness_checks
 }

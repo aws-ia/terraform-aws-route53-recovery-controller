@@ -20,14 +20,7 @@ variable "cells_definition" {
   }
   */
   type = map(map(string))
-  validation {
-    condition = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))]) && alltrue(flatten([
-      for arns in var.cells_definition : [
-        for service, arn in arns : contains(["elasticloadbalancing", "autoscaling", "lambda", "apigateway", "kafka", "rds", "ec2", "route53", "sns", "sqs", "dynamodb"], service)
-      ]
-    ]))
-    error_message = "Supported service names are elasticloadbalancing, autoscaling, lambda, apigateway, kafka, rds, ec2, route53, dynamodb, sns, or sqs."
-  }
+  // validation {} removed to reduce complexity when adding a new service, validation enforced via Root Module.
 }
 
 variable "service_list" {

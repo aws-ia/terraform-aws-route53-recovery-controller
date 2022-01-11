@@ -24,12 +24,6 @@ variable "cells_definition" {
   }
 }
 
-variable "global_table_arn" {
-  description = "Dyanmodb Global Table if being used. Only need to pass for 1 region, will parse other region table arns."
-  type        = string
-  default     = null
-}
-
 variable "create_safety_rule_assertion" {
   description = "Whether or not to create an Assertion Saftey Rule"
   type        = bool
@@ -73,7 +67,7 @@ variable "safety_rule_gating" {
 }
 
 variable "hosted_zone" {
-  description = "Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided."
+  description = "Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) ."
   type = object({
     name         = optional(string)
     private_zone = optional(bool)
@@ -81,7 +75,10 @@ variable "hosted_zone" {
     tags         = optional(map(string))
     zone_id      = optional(string)
   })
-  default = null
+  default = {
+    name         = null
+    zone_id      = null
+  }
 }
 
 variable "primary_cell_region" {
@@ -92,12 +89,6 @@ variable "primary_cell_region" {
     condition     = can(regex("[a-z][a-z]-[a-z]+-[1-9]", var.primary_cell_region)) || var.primary_cell_region == null
     error_message = "Must be a valid AWS region format."
   }
-}
-
-variable "configure_route53_alias_records" {
-  description = "If LBs are managed, determines if you want to create the requisite route53 alias records"
-  type        = bool
-  default     = true
 }
 
 variable "resource_type_name" {
@@ -116,10 +107,22 @@ variable "resource_type_name" {
     rds                  = "AWS::RDS::DBCluster"
     apigateway           = "AWS::ApiGatewayV2::Api"
     kafka                = "AWS::MSK::Cluster"
-    // ec2 AWS::EC2::VPNGateway
-    // ec2 AWS::EC2::VPNConnection
-    // ec2 AWS::EC2::CustomerGateway
-    // ec2 AWS::EC2::Volume
-    // apigateway v1?
+    # ec2 AWS::EC2::VPNGateway
+    # ec2 AWS::EC2::VPNConnection
+    # ec2 AWS::EC2::CustomerGateway
+    # ec2 AWS::EC2::Volume
+    # apigateway v1?
   }
+}
+
+variable "create_routing_control_cluster" {
+  description = "Create the Routing Control Cluster and associated resources."
+  type        = bool
+  default     = false
+}
+
+variable "create_r53_records" {
+  default     = false
+  description = "Whether or not to create the route53 alias records required."
+  type        = bool
 }
