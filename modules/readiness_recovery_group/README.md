@@ -1,12 +1,15 @@
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.2 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.68 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.68 |
 
 ## Modules
 
@@ -28,8 +31,8 @@ No modules.
 | <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below: | `map(map(string))` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name to prefix resources. | `string` | n/a | yes |
 | <a name="input_regions"></a> [regions](#input\_regions) | List of regions that contain Cells to manage. | `list(string)` | n/a | yes |
-| <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | n/a | `any` | n/a | yes |
-| <a name="input_service_list"></a> [service\_list](#input\_service\_list) | n/a | `any` | n/a | yes |
+| <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | n/a | yes |
+| <a name="input_service_list"></a> [service\_list](#input\_service\_list) | List of services that are being enabled. Names correspond with keys to `var.resource_type_name`. | `list(string)` | n/a | yes |
 
 ## Outputs
 

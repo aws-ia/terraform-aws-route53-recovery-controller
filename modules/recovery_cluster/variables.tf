@@ -8,46 +8,34 @@ variable "regions" {
   type        = list(string)
 }
 
-variable "create_safety_rule_assertion" {
-  description = "Whether or not to create an Assertion Saftey Rule"
-  type        = bool
-  default     = true
-}
-
-variable "safety_rule_assertion" {
-  description = "Configuration of the Assertion Safety Rule"
-  type = object({
-    wait_period_ms = number
-    inverted       = bool
-    threshold      = number
-    type           = string
-    name_suffix    = string
-  })
-  default = {
-    inverted       = false
-    threshold      = 1
-    type           = "ATLEAST"
-    wait_period_ms = 5000
-    name_suffix    = "MinCellsActive"
+variable "safety_rule_type" {
+  description = "Type of safety rules to create. Can only be \"assertion\" or \"gating\"."
+  type        = string
+  default     = "assertion"
+  validation {
+    condition     = var.safety_rule_type == lower("assertion") || var.safety_rule_type == lower("gating")
+    error_message = "Safety rule type can only be assertion or gating."
   }
 }
 
-variable "create_safety_rule_gating" {
-  description = "Whether or not to create an Gating Saftey Rule"
-  type        = bool
-  default     = false
-}
-
-variable "safety_rule_gating" {
-  description = "Configuration of the Gating Safety Rule"
-  type = object({
+variable "safety_rules" {
+  description = "Configuration of the Safety Rules"
+  type = map(object({
     wait_period_ms = number
     inverted       = bool
     threshold      = number
     type           = string
     name_suffix    = string
-  })
-  default = null
+  }))
+  default = {
+    MinCellsActive = {
+      inverted       = false
+      threshold      = 1
+      type           = "ATLEAST"
+      wait_period_ms = 5000
+      name_suffix    = "MinCellsActive"
+    }
+  }
 }
 
 variable "hosted_zone" {
@@ -75,16 +63,9 @@ variable "primary_cell_region" {
   }
 }
 
-// can we move providers to this module?
 variable "lb_info" {
   type        = any
   description = "Map of lb info from each region declared."
-}
-
-// still necessary?
-variable "configure_lbs" {
-  type        = bool
-  description = "Whether or not to define LBs"
 }
 
 variable "cells_definition" {
@@ -98,9 +79,5 @@ variable "cells_definition" {
   }
   */
   type = map(map(string))
-  // validation {} removed to reduce complexity when adding a new service, validation enforced via Root Module.
-}
-
-variable "create_r53_records" {
-  default = false
+  # validation {} removed to reduce complexity when adding a new service, validation enforced via Root Module.
 }

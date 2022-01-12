@@ -1,12 +1,12 @@
 variable "name" {
-    type = string
-    description = "Name of your application."
-    default = "test"
+  type        = string
+  description = "Name of your application."
+  default     = "test"
 }
 
 variable "cells_definition" {
-    type = map(map(string))
-    description = "Definition of the resources that makeup your Cell that you want monitored by ARC."
+  type        = map(map(string))
+  description = "Definition of the resources that makeup your Cell that you want monitored by ARC."
 }
 
 variable "hosted_zone" {
@@ -24,7 +24,7 @@ variable "hosted_zone" {
   }
 }
 
-variable "create_routing_control_cluster" {
+variable "create_recovery_cluster" {
   description = "Create the Routing Control Cluster and associated resources."
   type        = bool
   default     = false

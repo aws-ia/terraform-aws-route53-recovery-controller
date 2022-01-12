@@ -44,50 +44,37 @@ variable "resource_type_name" {
     route53              = "AWS::Route53::HealthCheck"
     sns                  = "AWS::SNS::Topic"
     sqs                  = "AWS::SQS::Queue"
-    # apigateway v1?
   }
 }
 
-variable "create_safety_rule_assertion" {
-  description = "Whether or not to create an Assertion Saftey Rule"
-  type        = bool
-  default     = true
+variable "safety_rule_type" {
+  description = "Type of safety rules to create. Can only be \"assertion\" or \"gating\"."
+  type        = string
+  default     = "assertion"
+  validation {
+    condition     = var.safety_rule_type == lower("assertion") || var.safety_rule_type == lower("gating")
+    error_message = "Safety rule type can only be \"assertion\" or \"gating\"."
+  }
 }
 
-variable "safety_rule_assertion" {
-  description = "Configuration of the Assertion Safety Rule"
-  type = object({
+variable "safety_rules" {
+  description = "Configuration of the Safety Rules. Key is the name applied to the rule."
+  type = map(object({
     wait_period_ms = number
     inverted       = bool
     threshold      = number
     type           = string
     name_suffix    = string
-  })
+  }))
   default = {
-    inverted       = false
-    threshold      = 1
-    type           = "ATLEAST"
-    wait_period_ms = 5000
-    name_suffix    = "MinCellsActive"
+    MinCellsActive = {
+      inverted       = false
+      threshold      = 1
+      type           = "ATLEAST"
+      wait_period_ms = 5000
+      name_suffix    = "MinCellsActive"
+    }
   }
-}
-
-variable "create_safety_rule_gating" {
-  description = "Whether or not to create an Gating Saftey Rule"
-  type        = bool
-  default     = false
-}
-
-variable "safety_rule_gating" {
-  description = "Configuration of the Gating Safety Rule"
-  type = object({
-    wait_period_ms = number
-    inverted       = bool
-    threshold      = number
-    type           = string
-    name_suffix    = string
-  })
-  default = null
 }
 
 variable "hosted_zone" {
@@ -115,14 +102,8 @@ variable "primary_cell_region" {
   }
 }
 
-variable "create_routing_control_cluster" {
+variable "create_recovery_cluster" {
   description = "Create the Routing Control Cluster and associated resources."
   type        = bool
   default     = false
-}
-
-variable "create_r53_records" {
-  default     = false
-  description = "Whether or not to create the route53 alias records required."
-  type        = bool
 }

@@ -36,7 +36,7 @@ cells_definition = {
 To define an ARC cluster for managed failover you should add the below values to as terraform variables.
 
 ```terraform
-create_routing_control_cluster = false
+create_recovery_cluster = false
 
 hosted_zone = {
   name         = "mycoolapp.com."
@@ -115,7 +115,7 @@ If any services are added to ARC or missing from this module, to include please 
 |------|-------------|------|---------|:--------:|
 | <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below: | `map(map(string))` | n/a | yes |
 | <a name="input_create_r53_records"></a> [create\_r53\_records](#input\_create\_r53\_records) | Whether or not to create the route53 alias records required. | `bool` | `false` | no |
-| <a name="input_create_routing_control_cluster"></a> [create\_routing\_control\_cluster](#input\_create\_routing\_control\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
+| <a name="input_create_recovery_cluster"></a> [create\_routing\_control\_cluster](#input\_create\_routing\_control\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
 | <a name="input_create_safety_rule_assertion"></a> [create\_safety\_rule\_assertion](#input\_create\_safety\_rule\_assertion) | Whether or not to create an Assertion Saftey Rule | `bool` | `true` | no |
 | <a name="input_create_safety_rule_gating"></a> [create\_safety\_rule\_gating](#input\_create\_safety\_rule\_gating) | Whether or not to create an Gating Saftey Rule | `bool` | `false` | no |
 | <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) . | <pre>object({<br>    name         = optional(string)<br>    private_zone = optional(bool)<br>    vpc_id       = optional(number)<br>    tags         = optional(map(string))<br>    zone_id      = optional(string)<br>  })</pre> | <pre>{<br>  "name": null,<br>  "zone_id": null<br>}</pre> | no |

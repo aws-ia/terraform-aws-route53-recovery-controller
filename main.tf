@@ -18,20 +18,16 @@ module "recovery_group" {
 
 ## Routing Control
 
-module "routing_control_cluster" {
-  count  = var.create_routing_control_cluster ? 1 : 0
-  source = "./modules/routing_control_cluster"
+module "recovery_cluster" {
+  count  = var.create_recovery_cluster ? 1 : 0
+  source = "./modules/recovery_cluster"
 
-  name                         = var.name
-  regions                      = local.regions
-  create_safety_rule_assertion = var.create_safety_rule_assertion
-  safety_rule_assertion        = var.safety_rule_assertion
-  create_safety_rule_gating    = var.create_safety_rule_gating
-  safety_rule_gating           = var.safety_rule_gating
-  hosted_zone                  = var.hosted_zone
-  lb_info                      = local.lb_info
-  configure_lbs                = local.configure_lbs
-  cells_definition             = var.cells_definition
-  create_r53_records           = var.create_r53_records
-  primary_cell_region          = var.primary_cell_region
+  name                = var.name
+  regions             = local.regions
+  safety_rule_type    = var.safety_rule_type
+  safety_rules        = var.safety_rules
+  hosted_zone         = var.hosted_zone
+  lb_info             = local.lb_info
+  cells_definition    = var.cells_definition
+  primary_cell_region = var.primary_cell_region
 }

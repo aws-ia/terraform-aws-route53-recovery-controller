@@ -12,7 +12,7 @@ resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
   cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
 }
 
-// for service referenced in cells_defintion create a set with resources defined per region
+# for service referenced in cells_defintion create a set with resources defined per region
 resource "aws_route53recoveryreadiness_resource_set" "each_region_per_service" {
   for_each = toset(var.service_list)
 

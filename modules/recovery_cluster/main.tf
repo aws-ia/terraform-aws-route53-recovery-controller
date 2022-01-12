@@ -1,6 +1,6 @@
 data "aws_region" "current" {}
 
-// if zone_id and name are not passed, do not create route53 resources
+# if zone_id and name are not passed, do not create route53 resources
 data "aws_route53_zone" "main" {
   count = var.hosted_zone.zone_id != null || var.hosted_zone.name != null ? 1 : 0
 
@@ -32,33 +32,19 @@ resource "aws_route53recoverycontrolconfig_routing_control" "per_cell" {
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
 }
 
-resource "aws_route53recoverycontrolconfig_safety_rule" "assertion" {
-  count = var.create_safety_rule_assertion ? 1 : 0
+resource "aws_route53recoverycontrolconfig_safety_rule" "assertion_or_gating" {
+  for_each = var.safety_rules
 
-  asserted_controls = local.routing_controls_arns
+  asserted_controls = var.safety_rule_type == "assertion" ? local.routing_controls_arns : null
+  gating_controls   = var.safety_rule_type == "gating" ? local.routing_controls_arns : null
   control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
-  name              = "${var.name}-${var.safety_rule_assertion.name_suffix}"
-  wait_period_ms    = var.safety_rule_assertion.wait_period_ms
+  name              = "${var.name}-${each.key}"
+  wait_period_ms    = var.safety_rules[each.key].wait_period_ms
 
   rule_config {
-    inverted  = var.safety_rule_assertion.inverted
-    threshold = var.safety_rule_assertion.threshold
-    type      = var.safety_rule_assertion.type
-  }
-}
-
-resource "aws_route53recoverycontrolconfig_safety_rule" "gating" {
-  count = var.create_safety_rule_gating ? 1 : 0
-
-  gating_controls   = local.routing_controls_arns
-  control_panel_arn = aws_route53recoverycontrolconfig_control_panel.main.arn
-  name              = "${var.name}-${var.safety_rule_gating.name_suffix}"
-  wait_period_ms    = var.safety_rule_gating.wait_period_ms
-
-  rule_config {
-    inverted  = var.safety_rule_gating.inverted
-    threshold = var.safety_rule_gating.threshold
-    type      = var.safety_rule_gating.type
+    inverted  = var.safety_rules[each.key].inverted
+    threshold = var.safety_rules[each.key].threshold
+    type      = var.safety_rules[each.key].type
   }
 }
 
@@ -69,7 +55,7 @@ resource "aws_route53_health_check" "main" {
   type                = "RECOVERY_CONTROL"
 }
 
-// if zone_id and name are not passed, do not create route53 resources
+# if zone_id and name are not passed, do not create route53 resources
 resource "aws_route53_record" "alias" {
   for_each = can(data.aws_route53_zone.main[0].zone_id) ? var.cells_definition : {}
 
