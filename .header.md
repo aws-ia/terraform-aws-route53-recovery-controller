@@ -2,7 +2,7 @@
 
 AWS Route53 Application Recovery Controller (ARC) is a set of capabilities that continuously monitors an application’s ability to recover from failures and controls application recovery across multiple AWS Availability Zones, AWS Regions, and on premises environments to help you to build applications that must deliver very high availability.
 
-This module can deploy the readiness resources and also routing control cluster resources. Much of this code was adapted from [this AWS Blog](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/) which can also provide more context on ARC design and terms.
+This module can deploy just the Readiness Resources or both the Readiness and Recovery Cluster Resources. Much of this code was adapted from [this AWS Blog](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/) which can also provide more context on ARC design and terms.
 
 ## Usage
 
