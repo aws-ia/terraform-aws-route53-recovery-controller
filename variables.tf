@@ -17,7 +17,7 @@ variable "cells_definition" {
   validation {
     condition = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))]) && alltrue(flatten([
       for arns in var.cells_definition : [
-        for service, arn in arns : contains(["elasticloadbalancing", "autoscaling", "lambda", "apigateway", "kafka", "rds", "ec2", "route53", "sns", "sqs", "dynamodb"], service)
+        for service, arn in arns : contains(["elasticloadbalancing", "autoscaling", "lambda", "apigateway", "kafka", "rds", "ec2", "route53", "sns", "sqs", "dynamodb", "ec2-volume"], service)
       ]
     ]))
     error_message = "Supported service names are elasticloadbalancing, autoscaling, lambda, apigateway, kafka, rds, ec2, route53, dynamodb, sns, or sqs."
@@ -76,8 +76,8 @@ variable "hosted_zone" {
     zone_id      = optional(string)
   })
   default = {
-    name         = null
-    zone_id      = null
+    name    = null
+    zone_id = null
   }
 }
 
@@ -101,16 +101,16 @@ variable "resource_type_name" {
     dynamodb             = "AWS::DynamoDB::Table"
     sqs                  = "AWS::SQS::Queue"
     sns                  = "AWS::SNS::Topic"
-    ec2                  = "AWS::EC2::VPC"
     route53              = "AWS::Route53::HealthCheck"
     cloudwatch           = "AWS::CloudWatch::Alarm"
     rds                  = "AWS::RDS::DBCluster"
     apigateway           = "AWS::ApiGatewayV2::Api"
     kafka                = "AWS::MSK::Cluster"
-    # ec2 AWS::EC2::VPNGateway
-    # ec2 AWS::EC2::VPNConnection
-    # ec2 AWS::EC2::CustomerGateway
-    # ec2 AWS::EC2::Volume
+    ec2-volume           = "AWS::EC2::Volume"
+    ec2-vpc              = "AWS::EC2::VPC"
+    ec2-vpn-gw           = "AWS::EC2::VPNGateway"
+    ec2-vpc-cgw          = "AWS::EC2::CustomerGateway"
+    ec2-vpc-conn         = "AWS::EC2::VPNConnection"
     # apigateway v1?
   }
 }

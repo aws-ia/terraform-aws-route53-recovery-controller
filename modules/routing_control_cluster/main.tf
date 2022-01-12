@@ -2,7 +2,7 @@ data "aws_region" "current" {}
 
 // if zone_id and name are not passed, do not create route53 resources
 data "aws_route53_zone" "main" {
-  count = var.hosted_zone.zone_id != null ||  var.hosted_zone.name != null ? 1 : 0
+  count = var.hosted_zone.zone_id != null || var.hosted_zone.name != null ? 1 : 0
 
   name         = var.hosted_zone.name
   private_zone = var.hosted_zone.private_zone

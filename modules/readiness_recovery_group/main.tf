@@ -1,8 +1,7 @@
 locals {
   cell_arn_by_region = { for k, v in aws_route53recoveryreadiness_cell.per_region : k => v.arn }
-
-
 }
+
 resource "aws_route53recoveryreadiness_cell" "per_region" {
   for_each  = toset(var.regions)
   cell_name = "${var.name}-${each.value}"

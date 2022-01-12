@@ -19,7 +19,7 @@ module "recovery_group" {
 ## Routing Control
 
 module "routing_control_cluster" {
-  count = var.create_routing_control_cluster ? 1 : 0
+  count  = var.create_routing_control_cluster ? 1 : 0
   source = "./modules/routing_control_cluster"
 
   name                         = var.name

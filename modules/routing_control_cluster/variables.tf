@@ -60,8 +60,8 @@ variable "hosted_zone" {
     zone_id      = optional(string)
   })
   default = {
-    name         = null
-    zone_id      = null
+    name    = null
+    zone_id = null
   }
 }
 
