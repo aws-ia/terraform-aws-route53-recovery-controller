@@ -129,6 +129,12 @@ If any services are added to ARC or missing from this module, to include please 
 | Name | Description |
 |------|-------------|
 | <a name="output_cells"></a> [cells](#output\_cells) | Cells per region. |
+| <a name="output_cluster"></a> [cluster](#output\_cluster) | Cluster info. |
+| <a name="output_control_panel"></a> [control\_panel](#output\_control\_panel) | Control Panel info. |
+| <a name="output_health_checks"></a> [health\_checks](#output\_health\_checks) | Health Checks. |
+| <a name="output_r53_aliases"></a> [r53\_aliases](#output\_r53\_aliases) | Route53 Alias Records, if created. |
 | <a name="output_readiness_checks"></a> [readiness\_checks](#output\_readiness\_checks) | A Readiness Check for each Resource Set |
 | <a name="output_recovery_group"></a> [recovery\_group](#output\_recovery\_group) | Recovery Group resource. |
 | <a name="output_resource_sets"></a> [resource\_sets](#output\_resource\_sets) | A Resource Set for each service with ARN entries for each region. |
+| <a name="output_routing_controls"></a> [routing\_controls](#output\_routing\_controls) | Routing Controls per Cell. |
+| <a name="output_safety_rules"></a> [safety\_rules](#output\_safety\_rules) | Safety Rules. |

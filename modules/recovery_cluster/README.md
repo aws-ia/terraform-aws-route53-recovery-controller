@@ -40,8 +40,14 @@ No modules.
 | <a name="input_regions"></a> [regions](#input\_regions) | List of regions that contain Cells to manage. | `list(string)` | n/a | yes |
 | <a name="input_safety_rule_type"></a> [safety\_rule\_type](#input\_safety\_rule\_type) | Type of safety rules to create. Can only be "assertion" or "gating". | `string` | `"assertion"` | no |
 | <a name="input_safety_rules"></a> [safety\_rules](#input\_safety\_rules) | Configuration of the Safety Rules | <pre>map(object({<br>    wait_period_ms = number<br>    inverted       = bool<br>    threshold      = number<br>    type           = string<br>    name_suffix    = string<br>  }))</pre> | <pre>{<br>  "MinCellsActive": {<br>    "inverted": false,<br>    "name_suffix": "MinCellsActive",<br>    "threshold": 1,<br>    "type": "ATLEAST",<br>    "wait_period_ms": 5000<br>  }<br>}</pre> | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be added to Readiness resources. | `map(string)` | `null` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_cluster"></a> [cluster](#output\_cluster) | Cluster info. |
+| <a name="output_control_panel"></a> [control\_panel](#output\_control\_panel) | Control Panel info. |
+| <a name="output_health_checks"></a> [health\_checks](#output\_health\_checks) | Health Checks. |
+| <a name="output_r53_aliases"></a> [r53\_aliases](#output\_r53\_aliases) | Route53 Alias Records, if created. |
+| <a name="output_routing_controls"></a> [routing\_controls](#output\_routing\_controls) | Routing Controls per Cell. |
+| <a name="output_safety_rules"></a> [safety\_rules](#output\_safety\_rules) | Safety Rules. |

@@ -31,5 +31,4 @@ module "recovery_cluster" {
   lb_info             = local.lb_info
   cells_definition    = var.cells_definition
   primary_cell_region = var.primary_cell_region
-  tags                = var.tags
 }
