@@ -56,6 +56,7 @@ If any services are added to ARC or missing from this module, to include please 
 
 | Name | Version |
 |------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.2 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.68 |
 
 ## Providers
@@ -84,8 +85,8 @@ If any services are added to ARC or missing from this module, to include please 
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_recovery_cluster"></a> [recovery\_cluster](#module\_recovery\_cluster) | ./modules/recovery_cluster | n/a |
 | <a name="module_recovery_group"></a> [recovery\_group](#module\_recovery\_group) | ./modules/readiness_recovery_group | n/a |
-| <a name="module_routing_control_cluster"></a> [routing\_control\_cluster](#module\_routing\_control\_cluster) | ./modules/routing_control_cluster | n/a |
 
 ## Resources
 
@@ -113,17 +114,15 @@ If any services are added to ARC or missing from this module, to include please 
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below: | `map(map(string))` | n/a | yes |
-| <a name="input_create_r53_records"></a> [create\_r53\_records](#input\_create\_r53\_records) | Whether or not to create the route53 alias records required. | `bool` | `false` | no |
-| <a name="input_create_recovery_cluster"></a> [create\_routing\_control\_cluster](#input\_create\_routing\_control\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
-| <a name="input_create_safety_rule_assertion"></a> [create\_safety\_rule\_assertion](#input\_create\_safety\_rule\_assertion) | Whether or not to create an Assertion Saftey Rule | `bool` | `true` | no |
-| <a name="input_create_safety_rule_gating"></a> [create\_safety\_rule\_gating](#input\_create\_safety\_rule\_gating) | Whether or not to create an Gating Saftey Rule | `bool` | `false` | no |
+| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below: | `map(map(string))` | n/a | yes |
+| <a name="input_create_recovery_cluster"></a> [create\_recovery\_cluster](#input\_create\_recovery\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
 | <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) . | <pre>object({<br>    name         = optional(string)<br>    private_zone = optional(bool)<br>    vpc_id       = optional(number)<br>    tags         = optional(map(string))<br>    zone_id      = optional(string)<br>  })</pre> | <pre>{<br>  "name": null,<br>  "zone_id": null<br>}</pre> | no |
 | <a name="input_name"></a> [name](#input\_name) | Name to prefix resources. | `string` | n/a | yes |
 | <a name="input_primary_cell_region"></a> [primary\_cell\_region](#input\_primary\_cell\_region) | (Optional) Region name of which Cell to make Route53 Primary. Defaults to default provider region if not set. | `string` | `null` | no |
-| <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | <pre>{<br>  "apigateway": "AWS::ApiGatewayV2::Api",<br>  "autoscaling": "AWS::AutoScaling::AutoScalingGroup",<br>  "cloudwatch": "AWS::CloudWatch::Alarm",<br>  "dynamodb": "AWS::DynamoDB::Table",<br>  "ec2-volume": "AWS::EC2::Volume",<br>  "ec2-vpc": "AWS::EC2::VPC",<br>  "ec2-vpc-cgw": "AWS::EC2::CustomerGateway",<br>  "ec2-vpc-conn": "AWS::EC2::VPNConnection",<br>  "ec2-vpn-gw": "AWS::EC2::VPNGateway",<br>  "elasticloadbalancing": "AWS::ElasticLoadBalancingV2::LoadBalancer",<br>  "kafka": "AWS::MSK::Cluster",<br>  "lambda": "AWS::Lambda::Function",<br>  "rds": "AWS::RDS::DBCluster",<br>  "route53": "AWS::Route53::HealthCheck",<br>  "sns": "AWS::SNS::Topic",<br>  "sqs": "AWS::SQS::Queue"<br>}</pre> | no |
-| <a name="input_safety_rule_assertion"></a> [safety\_rule\_assertion](#input\_safety\_rule\_assertion) | Configuration of the Assertion Safety Rule | <pre>object({<br>    wait_period_ms = number<br>    inverted       = bool<br>    threshold      = number<br>    type           = string<br>    name_suffix    = string<br>  })</pre> | <pre>{<br>  "inverted": false,<br>  "name_suffix": "MinCellsActive",<br>  "threshold": 1,<br>  "type": "ATLEAST",<br>  "wait_period_ms": 5000<br>}</pre> | no |
-| <a name="input_safety_rule_gating"></a> [safety\_rule\_gating](#input\_safety\_rule\_gating) | Configuration of the Gating Safety Rule | <pre>object({<br>    wait_period_ms = number<br>    inverted       = bool<br>    threshold      = number<br>    type           = string<br>    name_suffix    = string<br>  })</pre> | `null` | no |
+| <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | <pre>{<br>  "apigateway": "AWS::ApiGatewayV2::Api",<br>  "autoscaling": "AWS::AutoScaling::AutoScalingGroup",<br>  "cloudwatch": "AWS::CloudWatch::Alarm",<br>  "dynamodb": "AWS::DynamoDB::Table",<br>  "ec2-volume": "AWS::EC2::Volume",<br>  "ec2-vpc": "AWS::EC2::VPC",<br>  "ec2-vpn-cgw": "AWS::EC2::CustomerGateway",<br>  "ec2-vpn-conn": "AWS::EC2::VPNConnection",<br>  "ec2-vpn-gw": "AWS::EC2::VPNGateway",<br>  "elasticloadbalancing": "AWS::ElasticLoadBalancingV2::LoadBalancer",<br>  "kafka": "AWS::MSK::Cluster",<br>  "lambda": "AWS::Lambda::Function",<br>  "rds": "AWS::RDS::DBCluster",<br>  "route53": "AWS::Route53::HealthCheck",<br>  "sns": "AWS::SNS::Topic",<br>  "sqs": "AWS::SQS::Queue"<br>}</pre> | no |
+| <a name="input_safety_rule_type"></a> [safety\_rule\_type](#input\_safety\_rule\_type) | Type of safety rules to create. Can only be "assertion" or "gating". | `string` | `"assertion"` | no |
+| <a name="input_safety_rules"></a> [safety\_rules](#input\_safety\_rules) | Configuration of the Safety Rules. Key is the name applied to the rule. | <pre>map(object({<br>    wait_period_ms = number<br>    inverted       = bool<br>    threshold      = number<br>    type           = string<br>    name_suffix    = string<br>  }))</pre> | <pre>{<br>  "MinCellsActive": {<br>    "inverted": false,<br>    "name_suffix": "MinCellsActive",<br>    "threshold": 1,<br>    "type": "ATLEAST",<br>    "wait_period_ms": 5000<br>  }<br>}</pre> | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be added to Readiness resources. | `map(string)` | `null` | no |
 
 ## Outputs
 

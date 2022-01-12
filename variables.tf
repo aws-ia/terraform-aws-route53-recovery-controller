@@ -107,3 +107,9 @@ variable "create_recovery_cluster" {
   type        = bool
   default     = false
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags to be added to Readiness resources."
+  default     = null
+}

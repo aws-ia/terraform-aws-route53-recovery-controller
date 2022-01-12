@@ -73,4 +73,5 @@ resource "aws_route53_record" "alias" {
   }
 
   health_check_id = lookup(aws_route53_health_check.main, each.key, null).id
+  tags            = var.tags
 }

@@ -33,6 +33,7 @@ No modules.
 | <a name="input_regions"></a> [regions](#input\_regions) | List of regions that contain Cells to manage. | `list(string)` | n/a | yes |
 | <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | n/a | yes |
 | <a name="input_service_list"></a> [service\_list](#input\_service\_list) | List of services that are being enabled. Names correspond with keys to `var.resource_type_name`. | `list(string)` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be added to Readiness resources. | `map(string)` | `null` | no |
 
 ## Outputs
 

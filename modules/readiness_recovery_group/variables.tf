@@ -31,3 +31,9 @@ variable "resource_type_name" {
   type        = map(string)
   description = "list of all service types you can pass and their associated Resource Set Type."
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags to be added to Readiness resources."
+  default     = null
+}

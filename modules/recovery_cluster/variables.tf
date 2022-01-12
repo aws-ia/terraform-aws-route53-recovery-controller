@@ -81,3 +81,9 @@ variable "cells_definition" {
   type = map(map(string))
   # validation {} removed to reduce complexity when adding a new service, validation enforced via Root Module.
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags to be added to Readiness resources."
+  default     = null
+}

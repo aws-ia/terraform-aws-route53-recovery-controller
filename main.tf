@@ -14,6 +14,7 @@ module "recovery_group" {
   cells_definition   = var.cells_definition
   service_list       = local.service_list
   resource_type_name = var.resource_type_name
+  tags               = var.tags
 }
 
 ## Routing Control
@@ -30,4 +31,5 @@ module "recovery_cluster" {
   lb_info             = local.lb_info
   cells_definition    = var.cells_definition
   primary_cell_region = var.primary_cell_region
+  tags                = var.tags
 }
