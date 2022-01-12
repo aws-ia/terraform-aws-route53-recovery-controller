@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "cells_definition" {
-  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below:"
+  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below:"
   /*
   cells_definition = {
     us-west-2 = {
@@ -17,10 +17,34 @@ variable "cells_definition" {
   validation {
     condition = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))]) && alltrue(flatten([
       for arns in var.cells_definition : [
-        for service, arn in arns : contains(["elasticloadbalancing", "autoscaling", "lambda", "apigateway", "kafka", "rds", "ec2", "route53", "sns", "sqs", "dynamodb", "ec2-volume"], service)
+        for service, arn in arns : contains(["apigateway", "autoscaling", "cloudwatch", "dynamodb", "ec2-volume", "ec2-vpc", "ec2-vpn-gw", "ec2-vpn-cgw", "ec2-vpn-conn", "elasticloadbalancing", "kafka", "lambda", "rds", "route53", "sns", "sqs"], service)
       ]
     ]))
-    error_message = "Supported service names are elasticloadbalancing, autoscaling, lambda, apigateway, kafka, rds, ec2, route53, dynamodb, sns, or sqs."
+    error_message = "Supported service names are the keys defined in var.resource_type_name ."
+  }
+}
+
+variable "resource_type_name" {
+  type        = map(string)
+  description = "list of all service types you can pass and their associated Resource Set Type."
+  default = {
+    apigateway           = "AWS::ApiGatewayV2::Api"
+    autoscaling          = "AWS::AutoScaling::AutoScalingGroup"
+    cloudwatch           = "AWS::CloudWatch::Alarm"
+    dynamodb             = "AWS::DynamoDB::Table"
+    ec2-volume           = "AWS::EC2::Volume"
+    ec2-vpc              = "AWS::EC2::VPC"
+    ec2-vpn-gw           = "AWS::EC2::VPNGateway"
+    ec2-vpn-cgw          = "AWS::EC2::CustomerGateway"
+    ec2-vpn-conn         = "AWS::EC2::VPNConnection"
+    elasticloadbalancing = "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    kafka                = "AWS::MSK::Cluster"
+    lambda               = "AWS::Lambda::Function"
+    rds                  = "AWS::RDS::DBCluster"
+    route53              = "AWS::Route53::HealthCheck"
+    sns                  = "AWS::SNS::Topic"
+    sqs                  = "AWS::SQS::Queue"
+    # apigateway v1?
   }
 }
 
@@ -88,30 +112,6 @@ variable "primary_cell_region" {
   validation {
     condition     = can(regex("[a-z][a-z]-[a-z]+-[1-9]", var.primary_cell_region)) || var.primary_cell_region == null
     error_message = "Must be a valid AWS region format."
-  }
-}
-
-variable "resource_type_name" {
-  type        = map(string)
-  description = "list of all service types you can pass and their associated Resource Set Type."
-  default = {
-    elasticloadbalancing = "AWS::ElasticLoadBalancingV2::LoadBalancer"
-    autoscaling          = "AWS::AutoScaling::AutoScalingGroup"
-    lambda               = "AWS::Lambda::Function"
-    dynamodb             = "AWS::DynamoDB::Table"
-    sqs                  = "AWS::SQS::Queue"
-    sns                  = "AWS::SNS::Topic"
-    route53              = "AWS::Route53::HealthCheck"
-    cloudwatch           = "AWS::CloudWatch::Alarm"
-    rds                  = "AWS::RDS::DBCluster"
-    apigateway           = "AWS::ApiGatewayV2::Api"
-    kafka                = "AWS::MSK::Cluster"
-    ec2-volume           = "AWS::EC2::Volume"
-    ec2-vpc              = "AWS::EC2::VPC"
-    ec2-vpn-gw           = "AWS::EC2::VPNGateway"
-    ec2-vpc-cgw          = "AWS::EC2::CustomerGateway"
-    ec2-vpc-conn         = "AWS::EC2::VPNConnection"
-    # apigateway v1?
   }
 }
 
