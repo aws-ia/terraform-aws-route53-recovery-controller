@@ -10,7 +10,7 @@ The primary configuration item is `cells_definition` which is a nested map that 
 
 ### Readiness Resources Only
 
-The below `terraform.tfvars` file would be enough to add all readiness resources to an application deployed in ACTIVE/PASSIVE between us-east-1/us-west-2. The ACTIVE region is determined by your `provider` block or by `var.primary_cell_region`.
+The below `terraform.tfvars` variable values would create a Recovery Group with Cells for `us-east-1` and `us-west-2`, a Resource Set for services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` for each region and arn is provided, and Readiness Checks for each service.
 
 ```terraform
 name = "my-asg-elb-ddb-app"
@@ -33,7 +33,9 @@ cells_definition = {
 
 ### Routing Control Cluster Resources & R53 Alias Records
 
-To define an ARC cluster for managed failover you should add the below values to as terraform variables.
+To define an ARC cluster for managed failover you should add the below values to as terraform variables. Currently we support ACTIVE/PASSIVE for applications across regions. The ACTIVE region is determined by your `provider` block or by `var.primary_cell_region`.
+
+Below would setup a Recovery Cluster with a single Control Panel, 1 Routing Control per region, Safety Rules (default 1, 1+ may be declared), 1 R53 Health Check per Routing Control, and R53 Alias records for each LB for the domain specified.
 
 ```terraform
 create_recovery_cluster = false
