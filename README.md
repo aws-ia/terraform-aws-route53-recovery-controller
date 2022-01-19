@@ -1,16 +1,16 @@
-# AWS Route53 Application Recovery Controller Module
+# Amazon Route53 Application Recovery Controller module
 
-AWS Route53 Application Recovery Controller (ARC) is a set of capabilities that continuously monitors an application’s ability to recover from failures and controls application recovery across multiple AWS Availability Zones, AWS Regions, and on premises environments to help you to build applications that must deliver very high availability.
+Amazon Route53 Application Recovery Controller (ARC) continuously monitors an application’s ability to recover from failures and controls application recovery across multiple AWS Availability Zones, AWS Regions, and on-premises environments. With ARC, you can build highly available applications.
 
-This module can deploy just the Readiness Resources or both the Readiness and Recovery Cluster Resources. Much of this code was adapted from [this AWS Blog](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/) which can also provide more context on ARC design and terms.
+This module can deploy just the readiness resources or both the readiness and recovery-cluster resources. Much of this code was adapted from [this AWS Blog](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/) which can also provide more context on ARC design and terms.
 
 ## Usage
 
-The primary configuration item is `cells_definition` which is a nested map that tells ARC which resources per region need to be added to ARC. Example usage below.
+The primary configuration item is `cells_definition`, a nested map that tells ARC which resources per Region must be added to ARC. Example usage below.
 
-### Readiness Resources Only
+### Readiness resources only
 
-The below `terraform.tfvars` variable values would create a Recovery Group with Cells for `us-east-1` and `us-west-2`, a Resource Set for services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` for each region and arn is provided, and Readiness Checks for each service.
+The below `terraform.tfvars` variable values creates a recovery group with cells for `us-east-1` and `us-west-2`, a resource set for services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` for each Region and Amazon Resource Number (ARN) is provided, and readiness checks for each service.
 
 ```terraform
 name = "my-asg-elb-ddb-app"
@@ -31,7 +31,7 @@ cells_definition = {
 }
 ```
 
-### Routing Control Cluster Resources & R53 Alias Records
+### Routing control cluster resources and Route 53 alias records
 
 To define an ARC cluster for managed failover you should add the below values to as terraform variables. Currently we support ACTIVE/PASSIVE for applications across regions. The ACTIVE region is determined by your `provider` block or by `var.primary_cell_region`.
 
@@ -45,7 +45,7 @@ hosted_zone = {
 }
 ```
 
-## Contributing to this Module
+## Contributing to this module
 
 ### Adding a new service
 
@@ -130,13 +130,13 @@ If any services are added to ARC or missing from this module, to include please 
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cells"></a> [cells](#output\_cells) | Cells per region. |
+| <a name="output_cells"></a> [cells](#output\_cells) | Cells per Region. |
 | <a name="output_cluster"></a> [cluster](#output\_cluster) | Cluster info. |
 | <a name="output_control_panel"></a> [control\_panel](#output\_control\_panel) | Control Panel info. |
 | <a name="output_health_checks"></a> [health\_checks](#output\_health\_checks) | Health Checks. |
 | <a name="output_r53_aliases"></a> [r53\_aliases](#output\_r53\_aliases) | Route53 Alias Records, if created. |
 | <a name="output_readiness_checks"></a> [readiness\_checks](#output\_readiness\_checks) | A Readiness Check for each Resource Set |
 | <a name="output_recovery_group"></a> [recovery\_group](#output\_recovery\_group) | Recovery Group resource. |
-| <a name="output_resource_sets"></a> [resource\_sets](#output\_resource\_sets) | A Resource Set for each service with ARN entries for each region. |
+| <a name="output_resource_sets"></a> [resource\_sets](#output\_resource\_sets) | A Resource Set for each service with ARN entries for each Region. |
 | <a name="output_routing_controls"></a> [routing\_controls](#output\_routing\_controls) | Routing Controls per Cell. |
 | <a name="output_safety_rules"></a> [safety\_rules](#output\_safety\_rules) | Safety Rules. |
