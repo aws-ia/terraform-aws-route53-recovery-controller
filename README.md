@@ -6,7 +6,7 @@
 
 The primary configuration variable is `cells_definition` in `variables.tf`. With this variable, you specify the AWS resources per Region (the "recovery group") that you want Route 53 ARC to monitor.
 
-### Readiness resources
+### Deploy readiness resources only
 
 The following `terraform.tvars` values create a recovery group with Regions `us-east-1` and `us-west-2`. Each Region cell contains AWS services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). This configuration provides a readiness check for each included service.
 
@@ -29,9 +29,9 @@ cells_definition = {
 }
 ```
 
-### Routing control cluster resources and Route 53 alias records
+### Deploy routing control cluster resources and Route 53 alias records
 
-To define a managed Route 53 ARC cluster for your application, add the following variables to ... . In the example shown, substitute your application for `mycoolapp.com`.
+To define a managed Route 53 ARC cluster for your application, add the following Terraform variables.
 
 ```terraform
 create_recovery_cluster = false
@@ -40,9 +40,9 @@ hosted_zone = {
   name         = "mycoolapp.com."
 }
 ```
-Currently, this module supports ACTIVE/PASSIVE for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
+Currently, this module supports active/passive for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
 
-The example shown configures the following:
+The example shown previously configures the following:
 * A recovery cluster with a single control panel.
 * One routing control per Region.
 * Safety rules. The default is one, but you can declare more than one.
