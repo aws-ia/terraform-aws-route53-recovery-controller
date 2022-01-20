@@ -1,16 +1,14 @@
 # AWS Route53 Application Recovery Controller Module
 
-AWS Route53 Application Recovery Controller (ARC) is a set of capabilities that continuously monitors an application’s ability to recover from failures and controls application recovery across multiple AWS Availability Zones, AWS Regions, and on premises environments to help you to build applications that must deliver very high availability.
-
-This module can deploy just the Readiness Resources or both the Readiness and Recovery Cluster Resources. Much of this code was adapted from [this AWS Blog](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/) which can also provide more context on ARC design and terms.
+[Amazon Route53 Application Recovery Controller (Route 53 ARC)](https://aws.amazon.com/blogs/aws/amazon-route-53-application-recovery-controller/) is a set of Route 53 features that help you build applications with high availability. Route 53 ARC can continuously monitor your application's ability to recover from failure and control recovery across multiple AWS Availability Zones, AWS Regions, and on-premises environments. This Terraform module contains both Route 53 ARC readiness and recovery-cluster resources. You can deploy only the readiness resources, or both. For more information about creating a resilience strategy with Route 53 ARC, see [Running recovery-oriented applications with Amazon Route 53 Application Recovery Controller, AWS CI/CD tools, and Terraform](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/).
 
 ## Usage
 
-The primary configuration item is `cells_definition` which is a nested map that tells ARC which resources per region need to be added to ARC. Example usage below.
+The primary configuration variable is `cells_definition`. With this variable, you specify the AWS resources per Region that you want Route 53 ARC to monitor.
 
-### Readiness Resources Only
+### Readiness resources only
 
-The below `terraform.tfvars` variable values would create a Recovery Group with Cells for `us-east-1` and `us-west-2`, a Resource Set for services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` for each region and arn is provided, and Readiness Checks for each service.
+The following `terraform.tvars` values create a recovery group. The recovery group consists of Region cells `us-east-1` and `us-west-2`, each with a resource set of services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). Readiness checks are associated with each resource set.
 
 ```terraform
 name = "my-asg-elb-ddb-app"
@@ -31,11 +29,9 @@ cells_definition = {
 }
 ```
 
-### Routing Control Cluster Resources & R53 Alias Records
+### Routing control cluster resources and Route 53 alias records
 
-To define an ARC cluster for managed failover you should add the below values to as terraform variables. Currently we support ACTIVE/PASSIVE for applications across regions. The ACTIVE region is determined by your `provider` block or by `var.primary_cell_region`.
-
-Below would setup a Recovery Cluster with a single Control Panel, 1 Routing Control per region, Safety Rules (default 1, 1+ may be declared), 1 R53 Health Check per Routing Control, and R53 Alias records for each LB for the domain specified.
+To define a managed Route 53 ARC cluster for your application, add the following Terraform variables.
 
 ```terraform
 create_recovery_cluster = true
@@ -45,14 +41,21 @@ hosted_zone = {
 }
 ```
 
-## Contributing to this Module
+The example shown configures the following:
+* A recovery cluster with a single control panel.
+* One routing control per Region.
+* Safety rules. The default is one, but you can declare more than one.
+* One Route 53 health check per routing control.
+* Route 53 alias records for each load balancer for the domain specified.
 
-### Adding a new service
+Currently, this module supports active/passive for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
 
-If any services are added to ARC or missing from this module, to include please make the module aware of the CFN Service Type by completing below steps:
+## Adding a new service
 
-1. add service to `var.resource_type_name` variable type definition
-1. add service key (from 1) to validation check for `var.cells_definition` in variables.tf
+You can contribute to this module by adding a new service. To do so, complete the following steps.
+
+1. Add the service to the `var.resource_type_name` variable type definition.
+1. Add the service key (from step 1) to the validation check for `var.cells_definition` in `variables.tf`.
 
 ## Requirements
 
@@ -130,13 +133,13 @@ If any services are added to ARC or missing from this module, to include please 
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cells"></a> [cells](#output\_cells) | Cells per region. |
-| <a name="output_cluster"></a> [cluster](#output\_cluster) | Cluster info. |
-| <a name="output_control_panel"></a> [control\_panel](#output\_control\_panel) | Control Panel info. |
-| <a name="output_health_checks"></a> [health\_checks](#output\_health\_checks) | Health Checks. |
-| <a name="output_r53_aliases"></a> [r53\_aliases](#output\_r53\_aliases) | Route53 Alias Records, if created. |
-| <a name="output_readiness_checks"></a> [readiness\_checks](#output\_readiness\_checks) | A Readiness Check for each Resource Set |
-| <a name="output_recovery_group"></a> [recovery\_group](#output\_recovery\_group) | Recovery Group resource. |
-| <a name="output_resource_sets"></a> [resource\_sets](#output\_resource\_sets) | A Resource Set for each service with ARN entries for each region. |
-| <a name="output_routing_controls"></a> [routing\_controls](#output\_routing\_controls) | Routing Controls per Cell. |
-| <a name="output_safety_rules"></a> [safety\_rules](#output\_safety\_rules) | Safety Rules. |
+| <a name="output_cells"></a> [cells](#output\_cells) | Cells per Region. |
+| <a name="output_cluster"></a> [cluster](#output\_cluster) | Cluster information. |
+| <a name="output_control_panel"></a> [control\_panel](#output\_control\_panel) | Control Panel information. |
+| <a name="output_health_checks"></a> [health\_checks](#output\_health\_checks) | Health checks. |
+| <a name="output_r53_aliases"></a> [r53\_aliases](#output\_r53\_aliases) | Route53 alias records, if created. |
+| <a name="output_readiness_checks"></a> [readiness\_checks](#output\_readiness\_checks) | A Readiness check for each resource set. |
+| <a name="output_recovery_group"></a> [recovery\_group](#output\_recovery\_group) | Recovery group resource. |
+| <a name="output_resource_sets"></a> [resource\_sets](#output\_resource\_sets) | A Resource set for each service with ARN entries for each Region. |
+| <a name="output_routing_controls"></a> [routing\_controls](#output\_routing\_controls) | Routing controls per cell. |
+| <a name="output_safety_rules"></a> [safety\_rules](#output\_safety\_rules) | Safety rules. |

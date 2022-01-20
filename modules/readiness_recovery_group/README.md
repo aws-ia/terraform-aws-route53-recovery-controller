@@ -28,7 +28,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below: | `map(map(string))` | n/a | yes |
+| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below: | `map(map(string))` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name to prefix resources. | `string` | n/a | yes |
 | <a name="input_regions"></a> [regions](#input\_regions) | List of regions that contain Cells to manage. | `list(string)` | n/a | yes |
 | <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | n/a | yes |

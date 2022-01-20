@@ -9,7 +9,7 @@ variable "regions" {
 }
 
 variable "cells_definition" {
-  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled: `elasticloadbalancing`, `autoscaling`, `lambda`. Example below:"
+  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below:"
   /*
   cells_definition = {
     us-west-2 = {
