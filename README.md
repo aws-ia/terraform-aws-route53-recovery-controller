@@ -4,11 +4,11 @@
 
 ## Usage
 
-The primary configuration variable is `cells_definition` in `variables.tf`. With this variable, you specify the AWS resources per Region (the "recovery group") that you want Route 53 ARC to monitor.
+The primary configuration variable is `cells_definition` in `variables.tf`. With this variable, you specify the AWS resources per Region that you want Route 53 ARC to monitor.
 
 ### Deploy readiness resources only
 
-The following `terraform.tvars` values create a recovery group with Regions `us-east-1` and `us-west-2`. Each Region cell contains AWS services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). This configuration provides a readiness check for each included service.
+The following `terraform.tvars` values create a recovery group. The recovery group consists of Region cells `us-east-1` and `us-west-2`, each with a resource set of services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). Readiness checks are associated with each resource set.
 
 ```terraform
 name = "my-asg-elb-ddb-app"
@@ -40,14 +40,14 @@ hosted_zone = {
   name         = "mycoolapp.com."
 }
 ```
-Currently, this module supports active/passive for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
-
-The example shown previously configures the following:
+The example shown configures the following:
 * A recovery cluster with a single control panel.
 * One routing control per Region.
 * Safety rules. The default is one, but you can declare more than one.
 * One Route 53 health check per routing control.
 * Route 53 alias records for each load balancer for the domain specified.
+
+Currently, this module supports active/passive for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
 
 ## Adding a new service
 
