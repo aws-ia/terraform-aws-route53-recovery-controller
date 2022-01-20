@@ -32,3 +32,7 @@ module "recovery_cluster" {
   cells_definition    = var.cells_definition
   primary_cell_region = var.primary_cell_region
 }
+
+resource "aws_vpc" "name" {
+
+}
