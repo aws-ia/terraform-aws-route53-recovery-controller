@@ -1,3 +1,7 @@
+# Multiple providers are needed to search for information if loadbalancers are apart of the ARC configuration
+# data sources are conditioned to check if LBs are being managed & per region. LBs will only be searched if
+# theyre specified in a particular region.
+
 # NORTHERN VIRGINIA : us-east-1
 provider "aws" {
   region = "us-east-1"

@@ -11,6 +11,7 @@ variable "cells_definition" {
 
 variable "hosted_zone" {
   description = "Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) ."
+
   type = object({
     name         = optional(string)
     private_zone = optional(bool)
@@ -18,6 +19,7 @@ variable "hosted_zone" {
     tags         = optional(map(string))
     zone_id      = optional(string)
   })
+
   default = {
     name    = null
     zone_id = null

@@ -5,7 +5,6 @@ locals {
 }
 
 # Readiness control
-
 module "recovery_group" {
   source = "./modules/readiness_recovery_group"
 
@@ -18,7 +17,6 @@ module "recovery_group" {
 }
 
 ## Routing Control
-
 module "recovery_cluster" {
   count  = var.create_recovery_cluster ? 1 : 0
   source = "./modules/recovery_cluster"

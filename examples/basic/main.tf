@@ -1,4 +1,4 @@
-module "arc" {
+module "basic-recovery-controller-example" {
   source = "../.."
 
   name                    = var.name

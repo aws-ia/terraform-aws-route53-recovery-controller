@@ -4,7 +4,7 @@ variable "name" {
 }
 
 variable "cells_definition" {
-  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below:"
+  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. For examples, see the variables.tf file"
   /*
   cells_definition = {
     us-west-2 = {
@@ -13,11 +13,14 @@ variable "cells_definition" {
     }
   }
   */
+
   type = map(map(string))
   validation {
     condition = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))]) && alltrue(flatten([
       for arns in var.cells_definition : [
-        for service, arn in arns : contains(["apigateway", "autoscaling", "cloudwatch", "dynamodb", "ec2-volume", "ec2-vpc", "ec2-vpn-gw", "ec2-vpn-cgw", "ec2-vpn-conn", "elasticloadbalancing", "kafka", "lambda", "rds", "route53", "sns", "sqs"], service)
+        for service, arn in arns : contains(["apigateway", "autoscaling", "cloudwatch", "dynamodb", "ec2-volume",
+                                             "ec2-vpc", "ec2-vpn-gw", "ec2-vpn-cgw", "ec2-vpn-conn", "elasticloadbalancing",
+                                             "kafka", "lambda", "rds", "route53", "sns", "sqs"], service)
       ]
     ]))
     error_message = "Supported service names are the keys defined in var.resource_type_name ."
@@ -27,6 +30,7 @@ variable "cells_definition" {
 variable "resource_type_name" {
   type        = map(string)
   description = "list of all service types you can pass and their associated Resource Set Type."
+
   default = {
     apigateway           = "AWS::ApiGatewayV2::Api"
     autoscaling          = "AWS::AutoScaling::AutoScalingGroup"
@@ -51,6 +55,7 @@ variable "safety_rule_type" {
   description = "Type of safety rules to create. Can only be \"assertion\" or \"gating\"."
   type        = string
   default     = "assertion"
+
   validation {
     condition     = var.safety_rule_type == lower("assertion") || var.safety_rule_type == lower("gating")
     error_message = "Safety rule type can only be \"assertion\" or \"gating\"."
@@ -59,6 +64,7 @@ variable "safety_rule_type" {
 
 variable "safety_rules" {
   description = "Configuration of the Safety Rules. Key is the name applied to the rule."
+
   type = map(object({
     wait_period_ms = number
     inverted       = bool
@@ -66,6 +72,7 @@ variable "safety_rules" {
     type           = string
     name_suffix    = string
   }))
+
   default = {
     MinCellsActive = {
       inverted       = false
@@ -78,7 +85,8 @@ variable "safety_rules" {
 }
 
 variable "hosted_zone" {
-  description = "Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) ."
+  description = "Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality)."
+
   type = object({
     name         = optional(string)
     private_zone = optional(bool)
@@ -86,6 +94,7 @@ variable "hosted_zone" {
     tags         = optional(map(string))
     zone_id      = optional(string)
   })
+
   default = {
     name    = null
     zone_id = null
@@ -93,9 +102,10 @@ variable "hosted_zone" {
 }
 
 variable "primary_cell_region" {
-  description = "(Optional) Region name of which Cell to make Route53 Primary. Defaults to default provider region if not set. "
+  description = "(Optional) Region name of which Cell to make Route53 Primary. Defaults to default provider region if not set."
   type        = string
   default     = null
+
   validation {
     condition     = can(regex("[a-z][a-z]-[a-z]+-[1-9]", var.primary_cell_region)) || var.primary_cell_region == null
     error_message = "Must be a valid AWS region format."

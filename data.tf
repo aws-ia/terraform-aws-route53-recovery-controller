@@ -100,7 +100,6 @@ data "aws_lb" "ap_southeast_2" {
   arn = var.cells_definition["ap-southeast-2"].elasticloadbalancing
 }
 
-
 data "aws_lb" "eu_central_1" {
   count    = local.configure_lbs && contains(local.regions, "eu-central-1") ? 1 : 0
   provider = aws.eu-central-1
