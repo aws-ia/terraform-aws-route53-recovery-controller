@@ -56,7 +56,7 @@ Currently, this module supports active/passive for applications across Regions. 
 You can contribute to this module by adding a new service. To do so, complete the following steps.
 
 1. Add the service to the `var.resource_type_name` variable type definition.
-1. Add the service key (from step 1) to the validation check for `var.cells_definition` in `variables.tf`.
+1. Add the service key (from step 1) to the validation check for `var.cells_definition` in [variables.tf](./variables.tf).
 
 ## Requirements
 
@@ -120,10 +120,10 @@ You can contribute to this module by adding a new service. To do so, complete th
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. Example below: | `map(map(string))` | n/a | yes |
+| <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. For examples, see the variables.tf file | `map(map(string))` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name to prefix resources. | `string` | n/a | yes |
 | <a name="input_create_recovery_cluster"></a> [create\_recovery\_cluster](#input\_create\_recovery\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
-| <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) . | <pre>object({<br>    name         = optional(string)<br>    private_zone = optional(bool)<br>    vpc_id       = optional(number)<br>    tags         = optional(map(string))<br>    zone_id      = optional(string)<br>  })</pre> | <pre>{<br>  "name": null,<br>  "zone_id": null<br>}</pre> | no |
+| <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality). | <pre>object({<br>    name         = optional(string)<br>    private_zone = optional(bool)<br>    vpc_id       = optional(number)<br>    tags         = optional(map(string))<br>    zone_id      = optional(string)<br>  })</pre> | <pre>{<br>  "name": null,<br>  "zone_id": null<br>}</pre> | no |
 | <a name="input_primary_cell_region"></a> [primary\_cell\_region](#input\_primary\_cell\_region) | (Optional) Region name of which Cell to make Route53 Primary. Defaults to default provider region if not set. | `string` | `null` | no |
 | <a name="input_resource_type_name"></a> [resource\_type\_name](#input\_resource\_type\_name) | list of all service types you can pass and their associated Resource Set Type. | `map(string)` | <pre>{<br>  "apigateway": "AWS::ApiGatewayV2::Api",<br>  "autoscaling": "AWS::AutoScaling::AutoScalingGroup",<br>  "cloudwatch": "AWS::CloudWatch::Alarm",<br>  "dynamodb": "AWS::DynamoDB::Table",<br>  "ec2-volume": "AWS::EC2::Volume",<br>  "ec2-vpc": "AWS::EC2::VPC",<br>  "ec2-vpn-cgw": "AWS::EC2::CustomerGateway",<br>  "ec2-vpn-conn": "AWS::EC2::VPNConnection",<br>  "ec2-vpn-gw": "AWS::EC2::VPNGateway",<br>  "elasticloadbalancing": "AWS::ElasticLoadBalancingV2::LoadBalancer",<br>  "kafka": "AWS::MSK::Cluster",<br>  "lambda": "AWS::Lambda::Function",<br>  "rds": "AWS::RDS::DBCluster",<br>  "route53": "AWS::Route53::HealthCheck",<br>  "sns": "AWS::SNS::Topic",<br>  "sqs": "AWS::SQS::Queue"<br>}</pre> | no |
 | <a name="input_safety_rule_type"></a> [safety\_rule\_type](#input\_safety\_rule\_type) | Type of safety rules to create. Can only be "assertion" or "gating". | `string` | `"assertion"` | no |
