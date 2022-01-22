@@ -1,0 +1,8 @@
+#!/bin/bash
+cd /home/ec2-user
+
+source .bash_profile 
+
+cd /home/ec2-user/nodejs-sample-app
+
+nohup node app.js > /home/ec2-user/output.log 2>&1 &

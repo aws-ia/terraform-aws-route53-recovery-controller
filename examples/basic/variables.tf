@@ -31,3 +31,9 @@ variable "create_recovery_cluster" {
   type        = bool
   default     = false
 }
+
+variable "alternative_region" {
+  description = "Alternative region"
+  default     = "us-west-2"
+  type        = string
+}

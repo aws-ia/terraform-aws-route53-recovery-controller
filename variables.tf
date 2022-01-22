@@ -19,8 +19,8 @@ variable "cells_definition" {
     condition = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))]) && alltrue(flatten([
       for arns in var.cells_definition : [
         for service, arn in arns : contains(["apigateway", "autoscaling", "cloudwatch", "dynamodb", "ec2-volume",
-                                             "ec2-vpc", "ec2-vpn-gw", "ec2-vpn-cgw", "ec2-vpn-conn", "elasticloadbalancing",
-                                             "kafka", "lambda", "rds", "route53", "sns", "sqs"], service)
+          "ec2-vpc", "ec2-vpn-gw", "ec2-vpn-cgw", "ec2-vpn-conn", "elasticloadbalancing",
+        "kafka", "lambda", "rds", "route53", "sns", "sqs"], service)
       ]
     ]))
     error_message = "Supported service names are the keys defined in var.resource_type_name ."

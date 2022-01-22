@@ -1,0 +1,40 @@
+version: 0.0
+os: linux
+files:
+ - source: /
+   destination: /home/ec2-user/nodejs-sample-app
+file_exists_behavior: OVERWRITE
+permissions:
+  - object: /home/ec2-user/nodejs-sample-app/app.js
+    owner: ec2-user
+    mode: 644
+    type:
+      - file
+  - object: /home/ec2-user/nodejs-sample-app/package.json
+    owner: ec2-user
+    mode: 644
+    type:
+      - file
+  - object: /home/ec2-user/nodejs-sample-app/npm-shrinkwrap.json
+    owner: ec2-user
+    mode: 644
+    type:
+      - file
+  - object: /home/ec2-user/nodejs-sample-app/node_modules
+    owner: ec2-user
+    mode: 744
+    type:
+      - directory
+hooks:
+  AfterInstall:
+   - location: scripts/install_dependencies
+     timeout: 300
+     runas: ec2-user
+  ApplicationStart:
+   - location: scripts/start_server
+     timeout: 300
+     runas: ec2-user
+  ApplicationStop:
+   - location: scripts/stop_server
+     timeout: 300
+     runas: ec2-user
