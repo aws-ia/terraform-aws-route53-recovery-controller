@@ -6,3 +6,8 @@ variable "alternative_region" {
 variable "app_name" {
   default = "tic-tac-toe"
 }
+
+variable "allowed_ips" {
+  description = "List of cidrs to allow communication to your app."
+  type = list(string)
+}

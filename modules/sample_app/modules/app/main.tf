@@ -1,8 +1,8 @@
 data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
-resource "aws_iam_role" "app-role" {
-  name               = "${var.name}-${data.aws_region.current.name}-app"
+resource "aws_iam_role" "app_role" {
+  name_prefix               = "${var.name}-${data.aws_region.current.name}-app"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 
@@ -27,10 +27,9 @@ resource "aws_iam_policy" "dynamodb_rw_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = ["dynamodb:*"]
+        Action   = ["dynamodb:*"] #tfsec:ignore:aws-iam-no-policy-wildcards
         Effect   = "Allow"
-        Resource = ["*"]
-        //        Resource = ["${var.DynamoDBTable}"]
+        Resource = [var.ddb]
       },
     ]
   })
@@ -39,7 +38,7 @@ resource "aws_iam_policy" "dynamodb_rw_policy" {
 
 resource "aws_iam_instance_profile" "app" {
   name = "${var.name}-${data.aws_region.current.name}"
-  role = aws_iam_role.app-role.name
+  role = aws_iam_role.app_role.name
 }
 
 resource "aws_launch_configuration" "launch_conf" {
@@ -118,17 +117,19 @@ resource "aws_security_group" "alb" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
+    description = "allow connections from user specified ip"
     protocol    = "tcp"
     from_port   = var.alb_listener_port
     to_port     = var.alb_listener_port
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.allowed_ips
   }
 
   egress {
+    description = "sample app"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-egress-sg
   }
   tags = {
     Name = var.name
@@ -138,8 +139,10 @@ resource "aws_security_group" "alb" {
 resource "aws_security_group" "asg" {
   name   = "${var.name}-asg"
   vpc_id = aws_vpc.main.id
+  description = "sg for asg"
 
   ingress {
+    description = "sample app"
     protocol        = "tcp"
     from_port       = var.app_port
     to_port         = var.app_port
@@ -147,10 +150,11 @@ resource "aws_security_group" "asg" {
   }
 
   egress {
+    description = "sample app"
     protocol    = "-1"
     from_port   = 0
     to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-egress-sg
   }
   tags = {
     Name = var.name
@@ -263,22 +267,19 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_alb" "alb" {
-  name               = var.name
-  internal           = false
+  name               = "${var.name}-${data.aws_region.current.name}"
+  internal           = false #tfsec:ignore:aws-elbv2-alb-not-public
   load_balancer_type = "application"
+  drop_invalid_header_fields = true
 
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.alb.id]
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
-# ALB TARGET GROUP
-# ---------------------------------------------------------------------------------------------------------------------
-
 resource "aws_alb_target_group" "trgp" {
   name                 = var.name
   port                 = var.app_port
-  protocol             = "HTTP"
+  protocol             = "HTTP" #tfsec:ignore:aws-elbv2-http-not-used
   vpc_id               = aws_vpc.main.id
   target_type          = "instance"
   deregistration_delay = 30
@@ -301,7 +302,7 @@ resource "aws_alb_target_group" "trgp" {
 resource "aws_alb_listener" "app" {
   load_balancer_arn = aws_alb.alb.id
   port              = var.alb_listener_port
-  protocol          = "HTTP"
+  protocol          = "HTTP" #tfsec:ignore:aws-elbv2-http-not-used
 
   default_action {
     target_group_arn = aws_alb_target_group.trgp.id

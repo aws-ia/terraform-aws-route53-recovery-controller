@@ -92,7 +92,7 @@ BUILDSPEC
 
 # create a service role for codedeploy
 resource "aws_iam_role" "codedeploy_service" {
-  name = "codedeploy-service-role"
+  name_prefix = "codedeploy-service-role"
 
   assume_role_policy = <<EOF
 {
@@ -237,15 +237,16 @@ EOF
 resource "aws_iam_policy" "codepipeline_policy" {
   description = "Policy to allow codepipeline to execute"
 
-  depends_on = [aws_s3_bucket.artifact_bucket_region_1, aws_s3_bucket.artifact_bucket_region_2]
-
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Action": [
-        "s3:*"
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:DescribeBucket"
       ],
       "Effect": "Allow",
       "Resource": ["${aws_s3_bucket.artifact_bucket_region_1.arn}/*",
@@ -262,13 +263,6 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "codebuild:BatchGetBuilds"
       ],
       "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Effect" : "Allow",
-      "Action" : [
-        "kms:*"
-      ],
       "Resource": "*"
     },
     {
@@ -291,13 +285,14 @@ resource "aws_iam_role_policy_attachment" "codepipeline_attach" {
 
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
-# Code Pipeline
-# ---------------------------------------------------------------------------------------------------------------------
-
+#tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "artifact_bucket_region_1" {
   acl           = "private"
   force_destroy = true
+
+  versioning {
+    enabled = true
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_region_1_public_block" {
@@ -309,12 +304,16 @@ resource "aws_s3_bucket_public_access_block" "s3_region_1_public_block" {
   restrict_public_buckets = true
 }
 
-
+#tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "artifact_bucket_region_2" {
   provider = aws.alternative
 
   acl           = "private"
   force_destroy = true
+
+  versioning {
+    enabled = true
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "s3_region_2_public_block" {
@@ -327,9 +326,6 @@ resource "aws_s3_bucket_public_access_block" "s3_region_2_public_block" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-
-
-# CodePipeline
 
 resource "aws_codepipeline" "pipeline" {
 
@@ -349,7 +345,6 @@ resource "aws_codepipeline" "pipeline" {
     type     = "S3"
     region   = var.alternative_region
   }
-
 
   stage {
     name = "Source"
@@ -416,11 +411,6 @@ resource "aws_codepipeline" "pipeline" {
       owner    = "AWS"
       provider = "Manual"
       version  = "1"
-
-      configuration = {
-        CustomData         = "Please make sure that the app was successfully deployed in the first Region before continuing."
-        ExternalEntityLink = "https://reinvent.awsevents.com/"
-      }
     }
   }
 

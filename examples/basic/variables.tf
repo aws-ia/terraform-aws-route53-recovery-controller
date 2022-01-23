@@ -33,8 +33,7 @@ variable "create_recovery_cluster" {
   default     = false
 }
 
-variable "alternative_region" {
-  description = "Alternative region"
-  default     = "us-west-2"
-  type        = string
+variable "allowed_ips" {
+  description = "List of cidrs to allow communication to your app."
+  type = list(string)
 }

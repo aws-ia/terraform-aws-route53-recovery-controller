@@ -30,3 +30,4 @@ override.tf.json
 # example: *tfplan*
 
 .archive_files
+results.json

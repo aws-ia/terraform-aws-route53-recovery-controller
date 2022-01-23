@@ -14,3 +14,12 @@ variable "alb_listener_port" {
 variable "app_port" {
   default = 3000
 }
+
+variable "ddb" {
+  description = "the ddb arn"
+}
+
+variable "allowed_ips" {
+  description = "List of cidrs to allow communication to your app."
+  type = list(string)
+}
