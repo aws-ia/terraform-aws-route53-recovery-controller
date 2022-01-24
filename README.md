@@ -5,7 +5,7 @@
 
 ## Usage
 
-The primary configuration variable is `cells_definition`. With this variable, you specify the AWS resources per Region that you want Route 53 ARC to monitor.
+The primary configuration variable is `cells_definition`. With this variable, you specify the AWS resources per Region that you want Route 53 ARC to monitor. See [examples](./examples) for working examples.
 
 ### Readiness resources only
 
@@ -51,12 +51,45 @@ The example shown configures the following:
 
 Currently, this module supports active/passive for applications across Regions. The active Region is determined by your `provider` block or by `var.primary_cell_region`. (See "Inputs", later in this document.)
 
-## Adding a new service
+## Available services
 
-You can contribute to this module by adding a new service. To do so, complete the following steps.
+The R53 Readiness service supports monitoring many services, most of which have been implemented in this module or can easily be added / extended (even without a PR!). The service keys used in `var.cells_definition` must match a key in `var.resource_type_name` in [variables.tf](./variables.tf#L28) which links to the CloudFormation resource type that is accepted by Readiness service. Example:
 
-1. Add the service to the `var.resource_type_name` variable type definition.
-1. Add the service key (from step 1) to the validation check for `var.cells_definition` in [variables.tf](./variables.tf).
+```terraform
+variable "resource_type_name" {
+  type        = map(string)
+  description = "list of all service types you can pass and their associated Resource Set Type."
+
+  default = {
+    apigateway           = "AWS::ApiGatewayV2::Api"
+    autoscaling          = "AWS::AutoScaling::AutoScalingGroup"
+    cloudwatch           = "AWS::CloudWatch::Alarm"
+    dynamodb             = "AWS::DynamoDB::Table"
+    ec2-volume           = "AWS::EC2::Volume"
+    ...
+  }
+}
+```
+
+### Adding a new service
+
+If a service does not exist in the default `var.resource_type_name` value you can include it without a PR. We also ask that you please do open a PR to include it in default value.
+
+Where you set your variables, simply define a new service key with the associated CloudFormation resource type. You must include all service keys that you plan to use in that root module. In the example below `new-service` is a new service that the Readiness can monitor. We add it to our local deployment and then use it immediately in `var.cells_definition`:
+
+```terraform
+resource_type_name = {
+  new-service  = "AWS::NewService::NewAction"
+  dynamodb     = "AWS::DynamoDB::Table"
+  ...
+}
+
+cells_definition = {
+  <region> = {
+    new-service = <arn>
+  }
+}
+```
 
 ## Requirements
 
@@ -69,23 +102,23 @@ You can contribute to this module by adding a new service. To do so, complete th
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.ap-northeast-1"></a> [aws.ap-northeast-1](#provider\_aws.ap-northeast-1) | 3.71.0 |
-| <a name="provider_aws.ap-northeast-2"></a> [aws.ap-northeast-2](#provider\_aws.ap-northeast-2) | 3.71.0 |
-| <a name="provider_aws.ap-northeast-3"></a> [aws.ap-northeast-3](#provider\_aws.ap-northeast-3) | 3.71.0 |
-| <a name="provider_aws.ap-south-1"></a> [aws.ap-south-1](#provider\_aws.ap-south-1) | 3.71.0 |
-| <a name="provider_aws.ap-southeast-1"></a> [aws.ap-southeast-1](#provider\_aws.ap-southeast-1) | 3.71.0 |
-| <a name="provider_aws.ap-southeast-2"></a> [aws.ap-southeast-2](#provider\_aws.ap-southeast-2) | 3.71.0 |
-| <a name="provider_aws.ca-central-1"></a> [aws.ca-central-1](#provider\_aws.ca-central-1) | 3.71.0 |
-| <a name="provider_aws.eu-central-1"></a> [aws.eu-central-1](#provider\_aws.eu-central-1) | 3.71.0 |
-| <a name="provider_aws.eu-north-1"></a> [aws.eu-north-1](#provider\_aws.eu-north-1) | 3.71.0 |
-| <a name="provider_aws.eu-west-1"></a> [aws.eu-west-1](#provider\_aws.eu-west-1) | 3.71.0 |
-| <a name="provider_aws.eu-west-2"></a> [aws.eu-west-2](#provider\_aws.eu-west-2) | 3.71.0 |
-| <a name="provider_aws.eu-west-3"></a> [aws.eu-west-3](#provider\_aws.eu-west-3) | 3.71.0 |
-| <a name="provider_aws.sa-east-1"></a> [aws.sa-east-1](#provider\_aws.sa-east-1) | 3.71.0 |
-| <a name="provider_aws.us-east-1"></a> [aws.us-east-1](#provider\_aws.us-east-1) | 3.71.0 |
-| <a name="provider_aws.us-east-2"></a> [aws.us-east-2](#provider\_aws.us-east-2) | 3.71.0 |
-| <a name="provider_aws.us-west-1"></a> [aws.us-west-1](#provider\_aws.us-west-1) | 3.71.0 |
-| <a name="provider_aws.us-west-2"></a> [aws.us-west-2](#provider\_aws.us-west-2) | 3.71.0 |
+| <a name="provider_aws.ap-northeast-1"></a> [aws.ap-northeast-1](#provider\_aws.ap-northeast-1) | 3.73.0 |
+| <a name="provider_aws.ap-northeast-2"></a> [aws.ap-northeast-2](#provider\_aws.ap-northeast-2) | 3.73.0 |
+| <a name="provider_aws.ap-northeast-3"></a> [aws.ap-northeast-3](#provider\_aws.ap-northeast-3) | 3.73.0 |
+| <a name="provider_aws.ap-south-1"></a> [aws.ap-south-1](#provider\_aws.ap-south-1) | 3.73.0 |
+| <a name="provider_aws.ap-southeast-1"></a> [aws.ap-southeast-1](#provider\_aws.ap-southeast-1) | 3.73.0 |
+| <a name="provider_aws.ap-southeast-2"></a> [aws.ap-southeast-2](#provider\_aws.ap-southeast-2) | 3.73.0 |
+| <a name="provider_aws.ca-central-1"></a> [aws.ca-central-1](#provider\_aws.ca-central-1) | 3.73.0 |
+| <a name="provider_aws.eu-central-1"></a> [aws.eu-central-1](#provider\_aws.eu-central-1) | 3.73.0 |
+| <a name="provider_aws.eu-north-1"></a> [aws.eu-north-1](#provider\_aws.eu-north-1) | 3.73.0 |
+| <a name="provider_aws.eu-west-1"></a> [aws.eu-west-1](#provider\_aws.eu-west-1) | 3.73.0 |
+| <a name="provider_aws.eu-west-2"></a> [aws.eu-west-2](#provider\_aws.eu-west-2) | 3.73.0 |
+| <a name="provider_aws.eu-west-3"></a> [aws.eu-west-3](#provider\_aws.eu-west-3) | 3.73.0 |
+| <a name="provider_aws.sa-east-1"></a> [aws.sa-east-1](#provider\_aws.sa-east-1) | 3.73.0 |
+| <a name="provider_aws.us-east-1"></a> [aws.us-east-1](#provider\_aws.us-east-1) | 3.73.0 |
+| <a name="provider_aws.us-east-2"></a> [aws.us-east-2](#provider\_aws.us-east-2) | 3.73.0 |
+| <a name="provider_aws.us-west-1"></a> [aws.us-west-1](#provider\_aws.us-west-1) | 3.73.0 |
+| <a name="provider_aws.us-west-2"></a> [aws.us-west-2](#provider\_aws.us-west-2) | 3.73.0 |
 
 ## Modules
 

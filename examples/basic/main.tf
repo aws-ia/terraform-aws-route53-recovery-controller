@@ -5,7 +5,6 @@ module "basic_recovery_controller_example" {
   create_recovery_cluster = var.create_recovery_cluster
   hosted_zone             = var.hosted_zone
 
-  # cells_definition = var.cells_definition
   cells_definition = {
     us-east-1 = {
       autoscaling          = module.sample_app.asg_primary.arn
