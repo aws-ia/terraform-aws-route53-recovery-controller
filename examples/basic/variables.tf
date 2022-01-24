@@ -7,6 +7,7 @@ variable "name" {
 variable "cells_definition" {
   type        = map(map(string))
   description = "Definition of the resources that makeup your Cell that you want monitored by ARC."
+  default = null
 }
 
 variable "hosted_zone" {
@@ -30,4 +31,9 @@ variable "create_recovery_cluster" {
   description = "Create the Routing Control Cluster and associated resources."
   type        = bool
   default     = false
+}
+
+variable "allowed_ips" {
+  description = "List of cidrs to allow communication to your app."
+  type = list(string)
 }

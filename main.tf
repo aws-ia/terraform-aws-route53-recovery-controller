@@ -1,7 +1,7 @@
 locals {
   regions = keys(var.cells_definition)
-  # list of all services referenced in var.cells_definition with non-null arns
-  service_list = setintersection(compact(flatten([for _, cell_definition in var.cells_definition : [for service_name, arn in cell_definition : arn != null ? service_name : null]])))
+  # list of all services referenced in var.cells_definition
+  service_list = setintersection(compact(flatten([for _, cell_definition in var.cells_definition : [for service_name, arn in cell_definition : service_name]])))
 }
 
 # Readiness control

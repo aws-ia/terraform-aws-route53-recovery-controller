@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Instructions taken from:
+# https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
+#
+# Install node version manager (nvm) 
+
+cd /home/ec2-user/
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+
+source .bash_profile 
+
+# Use nvm to install the latest version of Node.js
+nvm install node
+
+nvm use node
+
+npm install npm@latest -g
+
+# Installing source NPM dependencies...
+cd /home/ec2-user/nodejs-sample-app
+
+npm install
+
+# Fix any vulnerability
+npm audit fix
