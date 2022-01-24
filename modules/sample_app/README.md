@@ -54,6 +54,7 @@
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_allowed_ips"></a> [allowed\_ips](#input\_allowed\_ips) | List of cidrs to allow communication to your app. | `list(string)` | n/a | yes |
 | <a name="input_alternative_region"></a> [alternative\_region](#input\_alternative\_region) | The Alternative AWS region to deploy app to. | `string` | `"us-west-2"` | no |
 | <a name="input_app_name"></a> [app\_name](#input\_app\_name) | n/a | `string` | `"tic-tac-toe"` | no |
 
