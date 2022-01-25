@@ -2,7 +2,7 @@ data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 resource "aws_iam_role" "app_role" {
-  name_prefix               = "${var.name}-${data.aws_region.current.name}-app"
+  name_prefix        = "${var.name}-${data.aws_region.current.name}-app"
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 
@@ -137,12 +137,12 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "asg" {
-  name   = "${var.name}-asg"
-  vpc_id = aws_vpc.main.id
+  name        = "${var.name}-asg"
+  vpc_id      = aws_vpc.main.id
   description = "sg for asg"
 
   ingress {
-    description = "sample app"
+    description     = "sample app"
     protocol        = "tcp"
     from_port       = var.app_port
     to_port         = var.app_port
@@ -267,9 +267,9 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_alb" "alb" {
-  name               = "${var.name}-${data.aws_region.current.name}"
-  internal           = false #tfsec:ignore:aws-elbv2-alb-not-public
-  load_balancer_type = "application"
+  name                       = "${var.name}-${data.aws_region.current.name}"
+  internal                   = false #tfsec:ignore:aws-elbv2-alb-not-public
+  load_balancer_type         = "application"
   drop_invalid_header_fields = true
 
   subnets         = aws_subnet.public.*.id

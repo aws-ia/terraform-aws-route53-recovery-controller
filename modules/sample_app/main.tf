@@ -58,14 +58,14 @@ resource "aws_dynamodb_table" "global" {
 }
 
 module "app_primary" {
-  source = "./modules/app"
-  ddb = aws_dynamodb_table.global.arn
+  source      = "./modules/app"
+  ddb         = aws_dynamodb_table.global.arn
   allowed_ips = var.allowed_ips
 }
 
 module "app_alternative" {
-  source = "./modules/app"
-  ddb = aws_dynamodb_table.global.arn
+  source      = "./modules/app"
+  ddb         = aws_dynamodb_table.global.arn
   allowed_ips = var.allowed_ips
 
   providers = {

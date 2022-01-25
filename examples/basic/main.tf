@@ -21,7 +21,7 @@ module "basic_recovery_controller_example" {
 
 # sample app is for demonstratino purposes only and is not safe for production workloads
 module "sample_app" {
-  source             = "../../modules/sample_app"
+  source      = "../../modules/sample_app"
   allowed_ips = var.allowed_ips
 }
 
