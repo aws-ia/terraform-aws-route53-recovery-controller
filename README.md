@@ -9,7 +9,7 @@ The primary configuration variable is `cells_definition`. With this variable, yo
 
 ### Readiness resources only
 
-The following `terraform.tvars` values create a recovery group. The recovery group consists of Region cells `us-east-1` and `us-west-2`, each with a resource set of services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). Readiness checks are associated with each resource set.
+The following `terraform.tfvars` values create a recovery group. The recovery group consists of Region cells `us-east-1` and `us-west-2`, each with a resource set of services `elasticloadbalancing`, `autoscaling`, `dynamodb`, and `ec2-volume` and their Amazon Resource Numbers (ARNs). Readiness checks are associated with each resource set.
 
 ```terraform
 name = "my-asg-elb-ddb-app"
