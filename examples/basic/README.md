@@ -5,13 +5,8 @@ To deploy a sample app consisting of Auto-Scaling Groups, ALBs, and DynamoDB Glo
 
 ```bash
 terraform init
-terraform apply -target module.sample_app
-terraform apply
-```
-
-To destroy:
-```
-terraform destroy
+# determine which cidr to allow access to your ALBs
+terraform apply -var 'allowed_ips=["1.2.3.4/32"]'
 ```
 
 ## Requirements
@@ -22,28 +17,24 @@ terraform destroy
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.70.0 |
+No providers.
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_basic-recovery-controller-example"></a> [basic-recovery-controller-example](#module\_basic-recovery-controller-example) | ../.. | n/a |
+| <a name="module_basic_recovery_controller_example"></a> [basic\_recovery\_controller\_example](#module\_basic\_recovery\_controller\_example) | ../.. | n/a |
 | <a name="module_sample_app"></a> [sample\_app](#module\_sample\_app) | ../../modules/sample_app | n/a |
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+No resources.
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_alternative_region"></a> [alternative\_region](#input\_alternative\_region) | Alternative region | `string` | `"us-west-2"` | no |
+| <a name="input_allowed_ips"></a> [allowed\_ips](#input\_allowed\_ips) | List of cidrs to allow communication to your app. | `list(string)` | n/a | yes |
 | <a name="input_cells_definition"></a> [cells\_definition](#input\_cells\_definition) | Definition of the resources that makeup your Cell that you want monitored by ARC. | `map(map(string))` | `null` | no |
 | <a name="input_create_recovery_cluster"></a> [create\_recovery\_cluster](#input\_create\_recovery\_cluster) | Create the Routing Control Cluster and associated resources. | `bool` | `false` | no |
 | <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Info about the hosted zone. If the `name` or `zone_id` is not passed, a search will be performed using the values provided. Leave null to not create Route53 Alias records (required for LB functionality) . | <pre>object({<br>    name         = optional(string)<br>    private_zone = optional(bool)<br>    vpc_id       = optional(number)<br>    tags         = optional(map(string))<br>    zone_id      = optional(string)<br>  })</pre> | <pre>{<br>  "name": null,<br>  "zone_id": null<br>}</pre> | no |
