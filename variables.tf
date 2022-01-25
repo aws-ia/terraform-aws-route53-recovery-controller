@@ -17,7 +17,7 @@ variable "cells_definition" {
   type = map(map(string))
   validation {
     condition     = alltrue([for _, k in keys(var.cells_definition) : can(regex("[a-z][a-z]-[a-z]+-[1-9]", k))])
-    error_message = "keys(cells_definition) must be valid AWS Region names."
+    error_message = "Keys(cells_definition) must be valid AWS Region names."
   }
 }
 
