@@ -9,5 +9,5 @@ variable "app_name" {
 
 variable "allowed_ips" {
   description = "List of cidrs to allow communication to your app."
-  type = list(string)
+  type        = list(string)
 }
