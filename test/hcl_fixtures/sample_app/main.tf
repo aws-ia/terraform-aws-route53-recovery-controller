@@ -1,5 +1,4 @@
 data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
 
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "app_source_code" {
@@ -19,12 +18,6 @@ resource "aws_s3_bucket_public_access_block" "app_source_code" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
-
-data "archive_file" "app_source_code" {
-  source_dir  = "${path.module}/src/"
-  type        = "zip"
-  output_path = "${path.root}/.archive_files/${var.app_name}.zip"
 }
 
 resource "aws_s3_bucket_object" "app_source_code" {

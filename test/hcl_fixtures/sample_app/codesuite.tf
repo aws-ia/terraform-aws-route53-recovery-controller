@@ -434,9 +434,3 @@ resource "aws_codepipeline" "pipeline" {
     }
   }
 }
-
-output "pipeline_url" {
-  value = "https://console.aws.amazon.com/codepipeline/home?region=${data.aws_region.current.name}#/view/${aws_codepipeline.pipeline.id}"
-}
-
-
