@@ -84,7 +84,7 @@ variable "hosted_zone" {
   type = object({
     name         = optional(string)
     private_zone = optional(bool)
-    vpc_id       = optional(number)
+    vpc_id       = optional(string)
     tags         = optional(map(string))
     zone_id      = optional(string)
   })
