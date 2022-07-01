@@ -4,7 +4,8 @@ variable "name" {
 }
 
 variable "cells_definition" {
-  description = "Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. For examples, see the variables.tf file"
+  description = <<-EOF
+  Nested map where the key is a region you want to enable and keys referring to resource arns to enable. Services enabled are defined in `var.resource_type_name`. For examples, see the variables.tf file"
   /*
   cells_definition = {
     us-west-2 = {
@@ -13,6 +14,7 @@ variable "cells_definition" {
     }
   }
   */
+EOF
 
   type = map(map(string))
   validation {
