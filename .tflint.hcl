@@ -3,13 +3,17 @@
 
 plugin "aws" {
     enabled = true
-    version = "0.12.0"
+    version = "0.14.0"
     source  = "github.com/terraform-linters/tflint-ruleset-aws"
 }
 
 config {
   module     = true
   force      = false
+  ignore_module = {
+   "test/hcl_fixtures/sample_app" = true
+   "test/hcl_fixtures/sample_app/modules/app" = true
+}
 }
 
 rule "terraform_required_providers" {

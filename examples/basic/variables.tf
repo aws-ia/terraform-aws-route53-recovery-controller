@@ -37,3 +37,18 @@ variable "allowed_ips" {
   description = "List of cidrs to allow communication to your app."
   type        = list(string)
 }
+
+variable "primary_app_arns" {
+  type        = any
+  description = "Outputs passed to module for testing purposes (/test/example_basic_test.go)"
+}
+
+variable "alternative_app_arns" {
+  type        = any
+  description = "Outputs passed to module for testing purposes (/test/example_basic_test.go)"
+}
+
+variable "dynamodb_table_arn" {
+  type        = string
+  description = "(optional) describe your variable"
+}

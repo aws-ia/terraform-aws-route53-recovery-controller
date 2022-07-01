@@ -3,13 +3,13 @@
 
 | Name | Version |
 |------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.15.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.68 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_archive"></a> [archive](#provider\_archive) | n/a |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.68 |
 | <a name="provider_aws.alternative"></a> [aws.alternative](#provider\_aws.alternative) | >= 3.68 |
 
@@ -46,8 +46,6 @@
 | [aws_s3_bucket_public_access_block.app_source_code](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_public_access_block.s3_region_1_public_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_public_access_block.s3_region_2_public_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
-| [archive_file.app_source_code](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
@@ -56,20 +54,19 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_allowed_ips"></a> [allowed\_ips](#input\_allowed\_ips) | List of cidrs to allow communication to your app. | `list(string)` | n/a | yes |
 | <a name="input_alternative_region"></a> [alternative\_region](#input\_alternative\_region) | The Alternative AWS region to deploy app to. | `string` | `"us-west-2"` | no |
-| <a name="input_app_name"></a> [app\_name](#input\_app\_name) | n/a | `string` | `"tic-tac-toe"` | no |
+| <a name="input_app_name"></a> [app\_name](#input\_app\_name) | test app variable | `string` | `"tic-tac-toe"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_alb_alternative"></a> [alb\_alternative](#output\_alb\_alternative) | n/a |
-| <a name="output_alb_primary"></a> [alb\_primary](#output\_alb\_primary) | n/a |
-| <a name="output_asg_alternative"></a> [asg\_alternative](#output\_asg\_alternative) | n/a |
-| <a name="output_asg_primary"></a> [asg\_primary](#output\_asg\_primary) | n/a |
-| <a name="output_code_deploy"></a> [code\_deploy](#output\_code\_deploy) | n/a |
-| <a name="output_dynamodb"></a> [dynamodb](#output\_dynamodb) | n/a |
-| <a name="output_dynamodb-arn"></a> [dynamodb-arn](#output\_dynamodb-arn) | n/a |
-| <a name="output_pipeline_url"></a> [pipeline\_url](#output\_pipeline\_url) | n/a |
-| <a name="output_s3_bucket_region_1"></a> [s3\_bucket\_region\_1](#output\_s3\_bucket\_region\_1) | n/a |
-| <a name="output_s3_bucket_region_2"></a> [s3\_bucket\_region\_2](#output\_s3\_bucket\_region\_2) | n/a |
+| <a name="output_alb_alternative"></a> [alb\_alternative](#output\_alb\_alternative) | fixture output |
+| <a name="output_alb_primary"></a> [alb\_primary](#output\_alb\_primary) | fixture output |
+| <a name="output_asg_alternative"></a> [asg\_alternative](#output\_asg\_alternative) | fixture output |
+| <a name="output_asg_primary"></a> [asg\_primary](#output\_asg\_primary) | fixture output |
+| <a name="output_code_deploy"></a> [code\_deploy](#output\_code\_deploy) | fixture output |
+| <a name="output_dynamodb_arn"></a> [dynamodb\_arn](#output\_dynamodb\_arn) | fixture output |
+| <a name="output_pipeline_url"></a> [pipeline\_url](#output\_pipeline\_url) | fixture output |
+| <a name="output_s3_bucket_region_1"></a> [s3\_bucket\_region\_1](#output\_s3\_bucket\_region\_1) | fixture output |
+| <a name="output_s3_bucket_region_2"></a> [s3\_bucket\_region\_2](#output\_s3\_bucket\_region\_2) | fixture output |
 <!-- END_TF_DOCS -->
