@@ -3,7 +3,9 @@
 
 [Amazon Route53 Application Recovery Controller (Route 53 ARC)](https://aws.amazon.com/blogs/aws/amazon-route-53-application-recovery-controller/) is a set of Route 53 features that help you build applications with high availability. Route 53 ARC can continuously monitor your application's ability to recover from failure and control recovery across multiple AWS Availability Zones, AWS Regions, and on-premises environments. This Terraform module contains both Route 53 ARC readiness and recovery-cluster resources. You can deploy only the readiness resources, or both. For more information about creating a resilience strategy with Route 53 ARC, see [Running recovery-oriented applications with Amazon Route 53 Application Recovery Controller, AWS CI/CD tools, and Terraform](https://aws.amazon.com/blogs/networking-and-content-delivery/running-recovery-oriented-applications-with-amazon-route-53-application-recovery-controller-aws-ci-cd-tools-and-terraform/).
 
-![Example deployment](images/sample-arc-app-architecture.png "Example Deployment of app with R53 ARC")
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aws-ia/terraform-aws-route53-recovery-controller/main/images/sample-arc-app-architecture.png" alt="Example Deployment of app with R53 ARC" width="100%">
+</p>
 
 ## Usage
 
