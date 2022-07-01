@@ -32,4 +32,5 @@ override.tf.json
 .archive_files
 results.json
 
-go.*
+go.mod
+go.sum
