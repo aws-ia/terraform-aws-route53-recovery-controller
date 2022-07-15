@@ -1,6 +1,6 @@
 output "recovery_group" {
   description = "Recovery Group resource."
-  value       = aws_route53recoveryreadiness_recovery_group.all_regions
+  value       = try(aws_route53recoveryreadiness_recovery_group.all_regions[0], null)
 }
 
 output "cells" {

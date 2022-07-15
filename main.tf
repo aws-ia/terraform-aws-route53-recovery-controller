@@ -8,12 +8,13 @@ locals {
 module "recovery_group" {
   source = "./modules/readiness_recovery_group"
 
-  name               = var.name
-  regions            = local.regions
-  cells_definition   = var.cells_definition
-  service_list       = local.service_list
-  resource_type_name = var.resource_type_name
-  tags               = var.tags
+  name                  = var.name
+  regions               = local.regions
+  cells_definition      = var.cells_definition
+  service_list          = local.service_list
+  resource_type_name    = var.resource_type_name
+  create_recovery_group = var.create_recovery_group
+  tags                  = var.tags
 }
 
 ## Routing Control

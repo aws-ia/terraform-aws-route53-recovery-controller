@@ -9,6 +9,8 @@ resource "aws_route53recoveryreadiness_cell" "per_region" {
 }
 
 resource "aws_route53recoveryreadiness_recovery_group" "all_regions" {
+  count = var.create_recovery_group ? 1 : 0
+
   recovery_group_name = var.name
   cells               = [for _, v in aws_route53recoveryreadiness_cell.per_region : v.arn]
   tags                = var.tags

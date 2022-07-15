@@ -119,3 +119,9 @@ variable "tags" {
   description = "Map of tags to be added to Readiness resources."
   default     = null
 }
+
+variable "create_recovery_group" {
+  type        = bool
+  description = "Whether or not to create a recovery group."
+  default     = true
+}
